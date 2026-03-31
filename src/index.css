@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: #0b0e14;
+  color: #e2e8f0;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #111827; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+/* Number animations */
+@keyframes flash-green {
+  0% { color: #22c55e; background: rgba(34, 197, 94, 0.1); }
+  100% { color: inherit; background: transparent; }
+}
+@keyframes flash-red {
+  0% { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+  100% { color: inherit; background: transparent; }
+}
+
+.flash-gain { animation: flash-green 0.6s ease-out; }
+.flash-loss { animation: flash-red 0.6s ease-out; }
+
+/* Glow effects */
+.glow-gain { box-shadow: 0 0 20px rgba(34, 197, 94, 0.15); }
+.glow-loss { box-shadow: 0 0 20px rgba(239, 68, 68, 0.15); }
+
+/* Panel base */
+.panel {
+  @apply bg-terminal-panel border border-terminal-border rounded-2xl;
+}
