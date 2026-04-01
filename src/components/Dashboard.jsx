@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { TrendingUp, TrendingDown, Clock, BarChart2, Activity, Search, Info, ShoppingCart, ArrowUpCircle, ArrowDownCircle } from 'lucide-react'
+import { TrendingUp, TrendingDown, Clock, BarChart2, Activity, Info, ShoppingCart, ArrowUpCircle, ArrowDownCircle } from 'lucide-react'
 import Chart from './Chart'
 import TickerSearch from './TickerSearch'
 import { usePrices } from '../context/PriceContext'
@@ -85,11 +85,8 @@ export default function Dashboard() {
 
         {/* Big Search Bar */}
         <div className="max-w-2xl mx-auto">
-          <div className="relative">
-            <Search size={22} className="absolute left-5 top-1/2 -translate-y-1/2 text-terminal-muted z-10" />
-            <div className="[&_input]:text-lg [&_input]:py-4 [&_input]:pl-14 [&_input]:pr-5 [&_input]:rounded-2xl [&>div]:max-w-none">
-              <TickerSearch onSelect={handleSelectTicker} currentSymbol="" />
-            </div>
+          <div className="[&_input]:text-lg [&_input]:py-4 [&_input]:pl-12 [&_input]:pr-5 [&_input]:rounded-2xl [&>div]:max-w-none [&_svg:first-child]:w-5 [&_svg:first-child]:h-5">
+            <TickerSearch onSelect={handleSelectTicker} currentSymbol="" />
           </div>
         </div>
 

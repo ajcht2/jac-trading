@@ -94,7 +94,7 @@ export default function TickerSearch({ onSelect, currentSymbol }) {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => query && results.length && setOpen(true)}
-          placeholder={`Search ticker... (viewing ${currentSymbol})`}
+          placeholder="Search stock or crypto..."
           className="w-full bg-terminal-panel border border-terminal-border rounded-xl pl-10 pr-10 py-2.5 text-sm font-mono text-terminal-text placeholder:text-terminal-muted focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all"
         />
         {query && (

@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { NavLink } from 'react-router-dom'
-import { BarChart3, ArrowLeftRight, Bot, BookOpen, RotateCcw, LogOut } from 'lucide-react'
+import { BarChart3, ArrowLeftRight, Bot, BookOpen, RotateCcw, LogOut, Newspaper } from 'lucide-react'
 import { usePortfolio } from '../context/PortfolioContext'
 import { usePrices } from '../context/PriceContext'
 import { useAuth } from '../context/AuthContext'
@@ -11,6 +11,7 @@ const navItems = [
   { to: '/', icon: BarChart3, label: 'Dashboard' },
   { to: '/trade', icon: ArrowLeftRight, label: 'Paper Trade' },
   { to: '/bot', icon: Bot, label: 'Trading Bot' },
+  { to: '/news', icon: Newspaper, label: 'News' },
   { to: '/strategies', icon: BookOpen, label: 'Strategies' },
 ]
 

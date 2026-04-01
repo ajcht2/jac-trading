@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard'
 import PaperTrading from './components/PaperTrading'
 import TradingBot from './components/TradingBot'
 import Strategies from './components/Strategies'
+import News from './components/News'
 
 export default function App() {
   const { user, loading } = useAuth()
@@ -27,6 +28,7 @@ export default function App() {
         <Route path="/trade" element={<PaperTrading />} />
         <Route path="/bot" element={<TradingBot />} />
         <Route path="/strategies" element={<Strategies />} />
+        <Route path="/news" element={<News />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

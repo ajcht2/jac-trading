@@ -194,7 +194,7 @@ const STRATEGIES = [
 ]
 
 export default function Strategies() {
-  const [expanded, setExpanded] = useState(STRATEGIES[0].id)
+  const [expanded, setExpanded] = useState(null)
 
   return (
     <div className="space-y-6 max-w-[1000px]">

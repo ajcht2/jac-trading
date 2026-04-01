@@ -2,27 +2,27 @@
 // Run with: node server.dev.js
 
 import http from 'http'
-import handler from './api/market.js'
+import marketHandler from './api/market.js'
+import newsHandler from './api/news.js'
 
 const PORT = 3001
 
 const server = http.createServer(async (req, res) => {
-  // Parse URL
   const url = new URL(req.url, `http://localhost:${PORT}`)
+  const query = Object.fromEntries(url.searchParams)
 
-  // Only handle /api/market
-  if (!url.pathname.startsWith('/api/market')) {
+  // Pick handler based on path
+  let handler = null
+  if (url.pathname.startsWith('/api/market')) handler = marketHandler
+  else if (url.pathname.startsWith('/api/news')) handler = newsHandler
+
+  if (!handler) {
     res.writeHead(404, { 'Content-Type': 'application/json' })
     res.end(JSON.stringify({ error: 'Not found' }))
     return
   }
 
-  // Build query object from URL params
-  const query = Object.fromEntries(url.searchParams)
-
-  // Mock Vercel request/response
   const mockReq = { query, method: req.method }
-
   const mockRes = {
     statusCode: 200,
     headers: {},
@@ -49,5 +49,6 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`\n  🔥 JAC Trading API proxy running on http://localhost:${PORT}`)
-  console.log(`  📊 Try: http://localhost:${PORT}/api/market?symbol=AAPL&action=quote\n`)
+  console.log(`  📊 Market: http://localhost:${PORT}/api/market?symbol=AAPL&action=quote`)
+  console.log(`  📰 News:   http://localhost:${PORT}/api/news\n`)
 })
