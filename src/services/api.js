@@ -55,6 +55,10 @@ export function formatNumber(n) {
 
 export function formatPrice(n) {
   if (n == null) return '—'
+  // More decimals for cheap assets (crypto like XRP, ADA, DOGE)
+  if (Math.abs(n) < 0.01) return n.toLocaleString('en-US', { minimumFractionDigits: 6, maximumFractionDigits: 6 })
+  if (Math.abs(n) < 1) return n.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 })
+  if (Math.abs(n) < 10) return n.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 })
   return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 

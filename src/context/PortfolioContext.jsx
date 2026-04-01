@@ -1,28 +1,23 @@
-import { createContext, useContext, useReducer, useEffect } from 'react'
+import { createContext, useContext, useReducer, useEffect, useRef, useCallback } from 'react'
+import { supabase } from '../services/supabase'
+import { useAuth } from './AuthContext'
 
 const PortfolioContext = createContext()
 
 const INITIAL_CASH = 100000
-const STORAGE_KEY = 'jac_trading_portfolio'
 
-function loadState() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) return JSON.parse(saved)
-  } catch (e) {
-    console.warn('Failed to load portfolio:', e)
-  }
-  return {
-    cash: INITIAL_CASH,
-    positions: {},   // { AAPL: { qty: 10, avgCost: 150.00 } }
-    transactions: [], // { id, type, symbol, qty, price, total, date }
-    botTrades: [],    // trades made by the bot
-    botConfig: null,  // { strategy, symbol, params, active }
-  }
+const DEFAULT_STATE = {
+  cash: INITIAL_CASH,
+  positions: {},
+  transactions: [],
+  loaded: false,
 }
 
 function reducer(state, action) {
   switch (action.type) {
+    case 'LOAD':
+      return { ...action.payload, loaded: true }
+
     case 'BUY': {
       const { symbol, qty, price } = action.payload
       const total = qty * price
@@ -35,21 +30,9 @@ function reducer(state, action) {
       return {
         ...state,
         cash: state.cash - total,
-        positions: {
-          ...state.positions,
-          [symbol]: { qty: newQty, avgCost: newAvgCost },
-        },
+        positions: { ...state.positions, [symbol]: { qty: newQty, avgCost: newAvgCost } },
         transactions: [
-          {
-            id: Date.now(),
-            type: 'BUY',
-            symbol,
-            qty,
-            price,
-            total,
-            date: new Date().toISOString(),
-            source: action.payload.source || 'manual',
-          },
+          { id: Date.now(), type: 'BUY', symbol, qty, price, total, date: new Date().toISOString(), source: action.payload.source || 'manual' },
           ...state.transactions,
         ],
       }
@@ -63,54 +46,22 @@ function reducer(state, action) {
       const total = qty * price
       const newQty = existing.qty - qty
       const newPositions = { ...state.positions }
-
-      if (newQty === 0) {
-        delete newPositions[symbol]
-      } else {
-        newPositions[symbol] = { ...existing, qty: newQty }
-      }
+      if (newQty === 0) delete newPositions[symbol]
+      else newPositions[symbol] = { ...existing, qty: newQty }
 
       return {
         ...state,
         cash: state.cash + total,
         positions: newPositions,
         transactions: [
-          {
-            id: Date.now(),
-            type: 'SELL',
-            symbol,
-            qty,
-            price,
-            total,
-            date: new Date().toISOString(),
-            source: action.payload.source || 'manual',
-          },
+          { id: Date.now(), type: 'SELL', symbol, qty, price, total, date: new Date().toISOString(), source: action.payload.source || 'manual' },
           ...state.transactions,
         ],
       }
     }
 
-    case 'SET_BOT_CONFIG':
-      return { ...state, botConfig: action.payload }
-
-    case 'STOP_BOT':
-      return {
-        ...state,
-        botConfig: state.botConfig ? { ...state.botConfig, active: false } : null,
-      }
-
-    case 'RESET':
-      return loadState()
-
     case 'FULL_RESET':
-      localStorage.removeItem(STORAGE_KEY)
-      return {
-        cash: INITIAL_CASH,
-        positions: {},
-        transactions: [],
-        botTrades: [],
-        botConfig: null,
-      }
+      return { cash: INITIAL_CASH, positions: {}, transactions: [], loaded: true }
 
     default:
       return state
@@ -118,15 +69,91 @@ function reducer(state, action) {
 }
 
 export function PortfolioProvider({ children }) {
-  const [state, dispatch] = useReducer(reducer, null, loadState)
+  const { user } = useAuth()
+  const [state, dispatch] = useReducer(reducer, DEFAULT_STATE)
+  const saveTimeoutRef = useRef(null)
+  const userIdRef = useRef(null)
 
-  // Persist to localStorage
+  // Load portfolio from Supabase when user logs in
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
-  }, [state])
+    if (!user?.id) return
+    userIdRef.current = user.id
+
+    const loadPortfolio = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('portfolios')
+          .select('*')
+          .eq('user_id', user.id)
+          .single()
+
+        if (data && !error) {
+          dispatch({
+            type: 'LOAD',
+            payload: {
+              cash: data.cash ?? INITIAL_CASH,
+              positions: data.positions ?? {},
+              transactions: data.transactions ?? [],
+            },
+          })
+        } else {
+          // No portfolio yet — create one
+          await supabase.from('portfolios').upsert({
+            user_id: user.id,
+            cash: INITIAL_CASH,
+            positions: {},
+            transactions: [],
+          })
+          dispatch({ type: 'LOAD', payload: { cash: INITIAL_CASH, positions: {}, transactions: [] } })
+        }
+      } catch (err) {
+        console.error('Failed to load portfolio:', err)
+        // Fallback to default
+        dispatch({ type: 'LOAD', payload: { cash: INITIAL_CASH, positions: {}, transactions: [] } })
+      }
+    }
+
+    loadPortfolio()
+  }, [user?.id])
+
+  // Save to Supabase after every state change (debounced 1s)
+  const saveToSupabase = useCallback(async (stateToSave) => {
+    if (!userIdRef.current || !stateToSave.loaded) return
+
+    try {
+      await supabase.from('portfolios').upsert({
+        user_id: userIdRef.current,
+        cash: stateToSave.cash,
+        positions: stateToSave.positions,
+        transactions: stateToSave.transactions.slice(0, 200), // keep last 200
+        updated_at: new Date().toISOString(),
+      })
+    } catch (err) {
+      console.error('Failed to save portfolio:', err)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!state.loaded || !user?.id) return
+
+    // Debounce saves
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+    saveTimeoutRef.current = setTimeout(() => {
+      saveToSupabase(state)
+    }, 1000)
+
+    return () => {
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+    }
+  }, [state, user?.id, saveToSupabase])
+
+  // Custom dispatch that also triggers save
+  const portfolioDispatch = useCallback((action) => {
+    dispatch(action)
+  }, [])
 
   return (
-    <PortfolioContext.Provider value={{ state, dispatch }}>
+    <PortfolioContext.Provider value={{ state, dispatch: portfolioDispatch }}>
       {children}
     </PortfolioContext.Provider>
   )

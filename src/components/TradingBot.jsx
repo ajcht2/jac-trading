@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Bot, Play, Square, Settings, TrendingUp, TrendingDown, BarChart2, Zap, AlertTriangle, BookOpen, Radio, History, Clock } from 'lucide-react'
+import { Bot, Play, Square, Settings, TrendingUp, TrendingDown, BarChart2, Zap, AlertTriangle, BookOpen, Radio, History, Clock, Info } from 'lucide-react'
 import { usePortfolio } from '../context/PortfolioContext'
 import { useBot } from '../context/BotContext'
 import { fetchChart, formatPrice, formatPercent } from '../services/api'
@@ -11,35 +11,35 @@ const STRATEGIES = {
     name: 'Moving Average Crossover',
     description: 'Buy when short SMA crosses above long SMA, sell on death cross.',
     params: [
-      { key: 'shortPeriod', label: 'Short SMA Period', default: 10, min: 2, max: 50 },
-      { key: 'longPeriod', label: 'Long SMA Period', default: 30, min: 10, max: 200 },
+      { key: 'shortPeriod', label: 'Short SMA Period', default: 10, min: 2, max: 50, tip: 'Number of days for the fast-moving average. Lower = more reactive to price changes, but more false signals.' },
+      { key: 'longPeriod', label: 'Long SMA Period', default: 30, min: 10, max: 200, tip: 'Number of days for the slow-moving average. Higher = smoother trend line, filters out noise but reacts slower.' },
     ],
   },
   rsi: {
     name: 'RSI Mean Reversion',
     description: 'Buy when RSI drops below oversold, sell when overbought.',
     params: [
-      { key: 'period', label: 'RSI Period', default: 14, min: 2, max: 50 },
-      { key: 'oversold', label: 'Oversold Level', default: 30, min: 10, max: 40 },
-      { key: 'overbought', label: 'Overbought Level', default: 70, min: 60, max: 90 },
+      { key: 'period', label: 'RSI Period', default: 14, min: 2, max: 50, tip: 'Number of days used to calculate the RSI. Standard is 14. Lower = more sensitive, higher = smoother.' },
+      { key: 'oversold', label: 'Oversold Level', default: 30, min: 10, max: 40, tip: 'RSI below this level triggers a BUY. The stock is considered "too cheap". Standard is 30.' },
+      { key: 'overbought', label: 'Overbought Level', default: 70, min: 60, max: 90, tip: 'RSI above this level triggers a SELL. The stock is considered "too expensive". Standard is 70.' },
     ],
   },
   macd: {
     name: 'MACD Signal',
     description: 'Buy when MACD crosses above signal line, sell on crossunder.',
     params: [
-      { key: 'fastPeriod', label: 'Fast EMA', default: 12, min: 2, max: 50 },
-      { key: 'slowPeriod', label: 'Slow EMA', default: 26, min: 10, max: 100 },
-      { key: 'signalPeriod', label: 'Signal Period', default: 9, min: 2, max: 30 },
+      { key: 'fastPeriod', label: 'Fast EMA', default: 12, min: 2, max: 50, tip: 'Period for the fast Exponential Moving Average. Reacts quickly to recent price changes. Standard is 12.' },
+      { key: 'slowPeriod', label: 'Slow EMA', default: 26, min: 10, max: 100, tip: 'Period for the slow Exponential Moving Average. Captures the longer-term trend. Standard is 26.' },
+      { key: 'signalPeriod', label: 'Signal Period', default: 9, min: 2, max: 30, tip: 'Period for the signal line (EMA of the MACD). Crossovers between MACD and signal generate trades. Standard is 9.' },
     ],
   },
   momentum: {
     name: 'Momentum Strategy',
     description: 'Buy when return over lookback exceeds threshold, sell when it drops below.',
     params: [
-      { key: 'lookback', label: 'Lookback Period (days)', default: 20, min: 5, max: 60 },
-      { key: 'buyThreshold', label: 'Buy Threshold (%)', default: 5, min: 1, max: 20 },
-      { key: 'sellThreshold', label: 'Sell Threshold (%)', default: -3, min: -15, max: 0 },
+      { key: 'lookback', label: 'Lookback Period (days)', default: 20, min: 5, max: 60, tip: 'How many days back to measure the return. Shorter = reacts to recent moves, longer = captures bigger trends.' },
+      { key: 'buyThreshold', label: 'Buy Threshold (%)', default: 5, min: 1, max: 20, tip: 'Minimum return over the lookback period to trigger a BUY. Higher = only buys strong uptrends.' },
+      { key: 'sellThreshold', label: 'Sell Threshold (%)', default: -3, min: -15, max: 0, tip: 'Maximum negative return to trigger a SELL. Lower = tolerates bigger dips before selling.' },
     ],
   },
 }
@@ -210,9 +210,18 @@ export default function TradingBot() {
               {bot.botActive && <p className="text-[10px] text-terminal-muted mt-1">Stop bot to change</p>}
             </div>
             {strat.params.map(p => (
-              <div key={p.key}>
-                <div className="flex justify-between">
-                  <label className="text-xs text-terminal-muted uppercase tracking-wider">{p.label}</label>
+              <div key={p.key} className="group/param relative">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-1">
+                    <label className="text-xs text-terminal-muted uppercase tracking-wider">{p.label}</label>
+                    {p.tip && <div className="relative">
+                      <Info size={10} className="text-terminal-muted/40 cursor-help peer" />
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 px-3 py-2 bg-terminal-bg border border-terminal-border rounded-xl shadow-xl z-50 hidden peer-hover:block">
+                        <p className="text-[11px] text-terminal-text leading-relaxed">{p.tip}</p>
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-terminal-bg border-r border-b border-terminal-border rotate-45 -mt-1" />
+                      </div>
+                    </div>}
+                  </div>
                   <span className="text-xs font-mono text-accent">{params[p.key]}</span>
                 </div>
                 <input type="range" min={p.min} max={p.max} value={params[p.key]} disabled={bot.botActive}

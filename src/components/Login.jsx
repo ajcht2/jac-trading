@@ -1,46 +1,42 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { TrendingUp, ArrowRight, BarChart3, Bot, Wallet } from 'lucide-react'
+import { ArrowRight, BarChart3, Bot, Wallet, Lock, Mail, User } from 'lucide-react'
 
 export default function Login() {
-  const { login } = useAuth()
+  const { signUp, signIn, error, setError } = useAuth()
+  const [mode, setMode] = useState('signup') // 'signup' or 'signin'
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [error, setError] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [signupSuccess, setSignupSuccess] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
-
-    if (!name.trim()) { setError('Enter your name'); return }
-    if (!email.trim() || !email.includes('@')) { setError('Enter a valid email'); return }
-
     setLoading(true)
 
-    // Send notification email via EmailJS (free tier)
-    try {
-      await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          service_id: 'YOUR_SERVICE_ID',       // Replace with your EmailJS service ID
-          template_id: 'YOUR_TEMPLATE_ID',     // Replace with your EmailJS template ID
-          user_id: 'YOUR_PUBLIC_KEY',           // Replace with your EmailJS public key
-          template_params: {
-            from_name: name,
-            from_email: email,
-            message: `New JAC Trading user: ${name} (${email}) joined at ${new Date().toLocaleString()}`,
-          },
-        }),
-      })
-    } catch {
-      // Don't block login if email fails
+    if (mode === 'signup') {
+      if (!name.trim()) { setError('Enter your name'); setLoading(false); return }
+      if (!email.trim() || !email.includes('@')) { setError('Enter a valid email'); setLoading(false); return }
+      if (password.length < 6) { setError('Password must be at least 6 characters'); setLoading(false); return }
+
+      const success = await signUp(name, email, password)
+      if (success) setSignupSuccess(true)
+    } else {
+      if (!email.trim()) { setError('Enter your email'); setLoading(false); return }
+      if (!password) { setError('Enter your password'); setLoading(false); return }
+
+      await signIn(email, password)
     }
 
-    const capitalizedName = name.trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')
-    login({ name: capitalizedName, email: email.trim(), joinedAt: new Date().toISOString() })
     setLoading(false)
+  }
+
+  const switchMode = () => {
+    setMode(mode === 'signup' ? 'signin' : 'signup')
+    setError('')
+    setSignupSuccess(false)
   }
 
   return (
@@ -61,65 +57,110 @@ export default function Login() {
 
         {/* Features */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-terminal-panel border border-terminal-border rounded-2xl p-4 text-center">
+          <div className="bg-terminal-panel/80 backdrop-blur border border-terminal-border rounded-2xl p-4 text-center">
             <BarChart3 size={24} className="text-accent mx-auto mb-2" />
             <p className="text-xs text-terminal-muted">Live Charts</p>
           </div>
-          <div className="bg-terminal-panel border border-terminal-border rounded-2xl p-4 text-center">
+          <div className="bg-terminal-panel/80 backdrop-blur border border-terminal-border rounded-2xl p-4 text-center">
             <Wallet size={24} className="text-gain mx-auto mb-2" />
             <p className="text-xs text-terminal-muted">Paper Trade</p>
           </div>
-          <div className="bg-terminal-panel border border-terminal-border rounded-2xl p-4 text-center">
+          <div className="bg-terminal-panel/80 backdrop-blur border border-terminal-border rounded-2xl p-4 text-center">
             <Bot size={24} className="text-purple-400 mx-auto mb-2" />
             <p className="text-xs text-terminal-muted">Algo Bot</p>
           </div>
         </div>
 
-        {/* Login Form */}
-        <div className="bg-terminal-panel border border-terminal-border rounded-2xl p-6 space-y-5">
-          <div>
-            <h2 className="text-lg font-semibold">Get Started</h2>
-            <p className="text-sm text-terminal-muted mt-1">Enter your details to start trading with $100,000</p>
+        {/* Auth Form */}
+        <div className="bg-terminal-panel/90 backdrop-blur border border-terminal-border rounded-2xl p-6 space-y-5">
+          {/* Mode Toggle */}
+          <div className="flex rounded-xl overflow-hidden border border-terminal-border">
+            <button onClick={() => { setMode('signup'); setError(''); setSignupSuccess(false) }}
+              className={`flex-1 py-2.5 text-sm font-semibold transition-all ${mode === 'signup' ? 'bg-accent/20 text-accent' : 'text-terminal-muted hover:text-terminal-text'}`}
+            >Sign Up</button>
+            <button onClick={() => { setMode('signin'); setError(''); setSignupSuccess(false) }}
+              className={`flex-1 py-2.5 text-sm font-semibold transition-all ${mode === 'signin' ? 'bg-accent/20 text-accent' : 'text-terminal-muted hover:text-terminal-text'}`}
+            >Sign In</button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="text-xs text-terminal-muted uppercase tracking-wider">Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                placeholder="Your name"
-                autoFocus
-                className="w-full mt-1.5 bg-terminal-bg border border-terminal-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all"
-              />
+          {signupSuccess ? (
+            <div className="text-center space-y-3 py-4">
+              <div className="w-16 h-16 rounded-full bg-gain/10 flex items-center justify-center mx-auto">
+                <Mail size={28} className="text-gain" />
+              </div>
+              <h3 className="font-semibold text-lg">Check your email</h3>
+              <p className="text-sm text-terminal-muted">We sent a confirmation link to <span className="text-terminal-text font-medium">{email}</span>. Click it to activate your account.</p>
+              <button onClick={() => { setMode('signin'); setSignupSuccess(false) }}
+                className="text-sm text-accent hover:underline mt-2"
+              >Already confirmed? Sign in →</button>
             </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <h2 className="text-lg font-semibold">
+                  {mode === 'signup' ? 'Create Account' : 'Welcome Back'}
+                </h2>
+                <p className="text-sm text-terminal-muted mt-1">
+                  {mode === 'signup' ? 'Start trading with $100,000 virtual cash' : 'Sign in to your trading account'}
+                </p>
+              </div>
 
-            <div>
-              <label className="text-xs text-terminal-muted uppercase tracking-wider">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="you@email.com"
-                className="w-full mt-1.5 bg-terminal-bg border border-terminal-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all"
-              />
-            </div>
-
-            {error && <p className="text-xs text-loss bg-loss/10 rounded-xl p-3">{error}</p>}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 rounded-xl bg-accent hover:bg-accent/90 text-white font-semibold text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <>Start Trading <ArrowRight size={16} /></>
+              {mode === 'signup' && (
+                <div>
+                  <label className="text-xs text-terminal-muted uppercase tracking-wider">Name</label>
+                  <div className="relative mt-1.5">
+                    <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-terminal-muted" />
+                    <input type="text" value={name} onChange={e => setName(e.target.value)}
+                      placeholder="Your name" autoFocus
+                      className="w-full bg-terminal-bg border border-terminal-border rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all"
+                    />
+                  </div>
+                </div>
               )}
-            </button>
-          </form>
+
+              <div>
+                <label className="text-xs text-terminal-muted uppercase tracking-wider">Email</label>
+                <div className="relative mt-1.5">
+                  <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-terminal-muted" />
+                  <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                    placeholder="you@email.com" autoFocus={mode === 'signin'}
+                    className="w-full bg-terminal-bg border border-terminal-border rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs text-terminal-muted uppercase tracking-wider">Password</label>
+                <div className="relative mt-1.5">
+                  <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-terminal-muted" />
+                  <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+                    placeholder={mode === 'signup' ? 'Min 6 characters' : 'Your password'}
+                    className="w-full bg-terminal-bg border border-terminal-border rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all"
+                  />
+                </div>
+              </div>
+
+              {error && <p className="text-xs text-loss bg-loss/10 rounded-xl p-3">{error}</p>}
+
+              <button type="submit" disabled={loading}
+                className="w-full py-3 rounded-xl bg-accent hover:bg-accent/90 text-white font-semibold text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <>{mode === 'signup' ? 'Create Account' : 'Sign In'} <ArrowRight size={16} /></>
+                )}
+              </button>
+
+              <p className="text-center text-xs text-terminal-muted">
+                {mode === 'signup' ? (
+                  <>Already have an account? <button type="button" onClick={switchMode} className="text-accent hover:underline">Sign in</button></>
+                ) : (
+                  <>Don't have an account? <button type="button" onClick={switchMode} className="text-accent hover:underline">Sign up</button></>
+                )}
+              </p>
+            </form>
+          )}
         </div>
 
         <p className="text-center text-xs text-terminal-muted">
