@@ -38,19 +38,25 @@ export default function Login() {
       // Don't block login if email fails
     }
 
-    login({ name: name.trim(), email: email.trim(), joinedAt: new Date().toISOString() })
+    const capitalizedName = name.trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')
+    login({ name: capitalizedName, email: email.trim(), joinedAt: new Date().toISOString() })
     setLoading(false)
   }
 
   return (
-    <div className="min-h-screen bg-terminal-bg flex items-center justify-center p-6">
-      <div className="w-full max-w-md space-y-8">
+    <div className="min-h-screen flex items-center justify-center p-6 relative">
+      <div className="fixed inset-0 z-0" style={{
+        backgroundImage: 'url(/city-bg.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}>
+        <div className="absolute inset-0 bg-terminal-bg/70" />
+      </div>
+      <div className="w-full max-w-md space-y-8 relative z-10">
         {/* Logo */}
         <div className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight">
-            <span className="text-accent">JAC</span> Trading
-          </h1>
-          <p className="text-terminal-muted mt-2 text-sm">Paper Trading Dashboard & Championship</p>
+          <img src="/logo.png" alt="JAC Trading" className="w-36 h-36 mx-auto rounded-2xl" style={{ backgroundColor: '#0b0e14' }} />
+          <p className="text-terminal-muted mt-3 text-sm">Paper Trading Dashboard & Championship</p>
         </div>
 
         {/* Features */}

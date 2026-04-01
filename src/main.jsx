@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { PortfolioProvider } from './context/PortfolioContext'
 import { PriceProvider } from './context/PriceContext'
+import { BotProvider } from './context/BotContext'
 import App from './App'
 import './index.css'
 
@@ -13,7 +14,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <AuthProvider>
         <PortfolioProvider>
           <PriceProvider>
-            <App />
+            <BotProvider>
+              <App />
+            </BotProvider>
           </PriceProvider>
         </PortfolioProvider>
       </AuthProvider>

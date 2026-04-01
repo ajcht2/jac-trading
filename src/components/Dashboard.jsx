@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
-import { TrendingUp, TrendingDown, Clock, BarChart2, Activity, Search, Info } from 'lucide-react'
+import { TrendingUp, TrendingDown, Clock, BarChart2, Activity, Search, Info, ShoppingCart, ArrowUpCircle, ArrowDownCircle } from 'lucide-react'
 import Chart from './Chart'
 import TickerSearch from './TickerSearch'
 import { usePrices } from '../context/PriceContext'
 import { useAuth } from '../context/AuthContext'
+import { usePortfolio } from '../context/PortfolioContext'
 import { fetchChart, getInterval, formatPrice, formatPercent, formatNumber } from '../services/api'
 
 const RANGES = ['1d', '5d', '1mo', '3mo', '6mo', '1y', '5y']
@@ -85,8 +86,8 @@ export default function Dashboard() {
         {/* Big Search Bar */}
         <div className="max-w-2xl mx-auto">
           <div className="relative">
-            <Search size={22} className="absolute left-5 top-1/2 -translate-y-1/2 text-terminal-muted" />
-            <div className="[&_input]:text-lg [&_input]:py-4 [&_input]:pl-14 [&_input]:pr-5 [&_input]:rounded-2xl">
+            <Search size={22} className="absolute left-5 top-1/2 -translate-y-1/2 text-terminal-muted z-10" />
+            <div className="[&_input]:text-lg [&_input]:py-4 [&_input]:pl-14 [&_input]:pr-5 [&_input]:rounded-2xl [&>div]:max-w-none">
               <TickerSearch onSelect={handleSelectTicker} currentSymbol="" />
             </div>
           </div>
@@ -170,48 +171,60 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Chart */}
-      <div className="panel p-5">
-        <div className="flex items-center gap-1 mb-4">
-          {RANGES.map(r => (
-            <button key={r} onClick={() => setRange(r)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-medium transition-all ${
-                range === r ? 'bg-accent text-white' : 'text-terminal-muted hover:text-terminal-text hover:bg-white/5'
-              }`}
-            >{RANGE_LABELS[r]}</button>
-          ))}
-          <div className="ml-auto flex items-center gap-2 text-xs text-terminal-muted">
-            <Clock size={12} />
-            {quote?.marketState === 'REGULAR' ? (
-              <span className="text-gain flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-gain animate-pulse" /> Market Open</span>
-            ) : <span>Market Closed</span>}
+      {/* Chart + Quick Trade */}
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
+        <div className="xl:col-span-3 panel p-5">
+          <div className="flex items-center gap-1 mb-4">
+            {RANGES.map(r => (
+              <button key={r} onClick={() => setRange(r)}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-medium transition-all ${
+                  range === r ? 'bg-accent text-white' : 'text-terminal-muted hover:text-terminal-text hover:bg-white/5'
+                }`}
+              >{RANGE_LABELS[r]}</button>
+            ))}
+            <div className="ml-auto flex items-center gap-2 text-xs text-terminal-muted">
+              <Clock size={12} />
+              {quote?.marketState === 'REGULAR' ? (
+                <span className="text-gain flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-gain animate-pulse" /> Market Open</span>
+              ) : <span>Market Closed</span>}
+            </div>
           </div>
+
+          {error ? (
+            <div className="h-[600px] flex items-center justify-center text-loss">
+              <div className="text-center">
+                <p className="font-medium">Error loading data</p>
+                <p className="text-sm mt-1 text-terminal-muted">{error}</p>
+                <button onClick={loadChart} className="mt-3 text-sm text-accent hover:underline">Try again</button>
+              </div>
+            </div>
+          ) : chartLoading ? (
+            <div className="h-[600px] flex items-center justify-center">
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                <p className="text-sm text-terminal-muted font-mono">Loading {symbol}...</p>
+              </div>
+            </div>
+          ) : chartData ? (
+            <Chart data={chartData} range={range} />
+          ) : null}
         </div>
 
-        {error ? (
-          <div className="h-[500px] flex items-center justify-center text-loss">
-            <div className="text-center">
-              <p className="font-medium">Error loading data</p>
-              <p className="text-sm mt-1 text-terminal-muted">{error}</p>
-              <button onClick={loadChart} className="mt-3 text-sm text-accent hover:underline">Try again</button>
-            </div>
-          </div>
-        ) : chartLoading ? (
-          <div className="h-[500px] flex items-center justify-center">
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm text-terminal-muted font-mono">Loading {symbol}...</p>
-            </div>
-          </div>
-        ) : chartData ? (
-          <Chart data={chartData} range={range} />
-        ) : null}
+        {/* Quick Trade */}
+        <QuickTrade symbol={symbol} quote={quote} />
       </div>
 
       {/* 52-Week Range */}
       {quote && quote.fiftyTwoWeekLow != null && quote.fiftyTwoWeekHigh != null && (
         <div className="panel p-5">
-          <p className="text-xs text-terminal-muted uppercase tracking-wider mb-3">52-Week Range</p>
+          <div className="flex items-center gap-2 mb-3 group relative cursor-help">
+            <p className="text-xs text-terminal-muted uppercase tracking-wider">52-Week Range</p>
+            <Info size={10} className="text-terminal-muted/50" />
+            <div className="absolute bottom-full left-0 mb-2 w-72 px-3 py-2 bg-terminal-bg border border-terminal-border rounded-xl shadow-xl z-50 hidden group-hover:block">
+              <p className="text-xs text-terminal-text leading-relaxed">The lowest and highest price this stock has traded at over the past 52 weeks (1 year). The white dot shows where the current price sits within that range — closer to green means near its yearly high, closer to red means near its yearly low.</p>
+              <div className="absolute top-full left-8 w-2 h-2 bg-terminal-bg border-r border-b border-terminal-border rotate-45 -mt-1" />
+            </div>
+          </div>
           <div className="flex items-center gap-4">
             <span className="font-mono text-sm text-loss">${formatPrice(quote.fiftyTwoWeekLow)}</span>
             <div className="flex-1 h-2.5 bg-terminal-border rounded-full relative">
@@ -299,6 +312,95 @@ function CryptoWatchlist({ onSelect, activeSymbol }) {
           })}
         </div>
       )}
+    </div>
+  )
+}
+
+// Quick Trade panel on Dashboard
+function QuickTrade({ symbol, quote }) {
+  const { state, dispatch } = usePortfolio()
+  const [side, setSide] = useState('BUY')
+  const [qty, setQty] = useState('')
+  const [success, setSuccess] = useState('')
+  const [error, setError] = useState('')
+
+  const price = quote?.price
+  const position = state.positions[symbol]
+  const total = price && qty ? Number(qty) * price : 0
+  const maxBuy = price ? Math.floor(state.cash / price) : 0
+  const maxSell = position?.qty || 0
+
+  const handleTrade = () => {
+    if (!price || !qty || Number(qty) <= 0) { setError('Enter a valid quantity'); return }
+    const q = Number(qty)
+    if (side === 'BUY') {
+      if (q * price > state.cash) { setError('Insufficient funds'); return }
+      dispatch({ type: 'BUY', payload: { symbol, qty: q, price } })
+    } else {
+      if (!position || position.qty < q) { setError(`Only ${position?.qty || 0} shares`); return }
+      dispatch({ type: 'SELL', payload: { symbol, qty: q, price } })
+    }
+    setSuccess(`${side === 'BUY' ? 'Bought' : 'Sold'} ${q} ${symbol}`)
+    setError(''); setQty('')
+    setTimeout(() => setSuccess(''), 3000)
+  }
+
+  if (!symbol || !quote) return null
+
+  return (
+    <div className="xl:col-span-1 panel p-5 space-y-4 h-fit">
+      <h3 className="font-semibold text-sm uppercase tracking-wider text-terminal-muted flex items-center gap-2">
+        <ShoppingCart size={14} /> Quick Trade
+      </h3>
+
+      <div className="flex rounded-xl overflow-hidden border border-terminal-border">
+        <button onClick={() => setSide('BUY')}
+          className={`flex-1 py-2 text-xs font-semibold transition-all flex items-center justify-center gap-1 ${side==='BUY'?'bg-gain/20 text-gain':'text-terminal-muted'}`}
+        ><ArrowUpCircle size={14}/>Buy</button>
+        <button onClick={() => setSide('SELL')}
+          className={`flex-1 py-2 text-xs font-semibold transition-all flex items-center justify-center gap-1 ${side==='SELL'?'bg-loss/20 text-loss':'text-terminal-muted'}`}
+        ><ArrowDownCircle size={14}/>Sell</button>
+      </div>
+
+      <div>
+        <p className="text-xs text-terminal-muted mb-1">Symbol</p>
+        <p className="font-mono font-semibold">{symbol}</p>
+        <p className="text-xs text-terminal-muted font-mono">${formatPrice(price)}</p>
+      </div>
+
+      {position && (
+        <div className="bg-terminal-bg rounded-xl p-2.5">
+          <p className="text-[10px] text-terminal-muted">You own</p>
+          <p className="text-sm font-mono font-semibold">{position.qty} shares</p>
+        </div>
+      )}
+
+      <div>
+        <div className="flex justify-between">
+          <label className="text-xs text-terminal-muted">Quantity</label>
+          <button onClick={() => setQty(String(side === 'BUY' ? maxBuy : maxSell))} className="text-[10px] text-accent hover:underline">
+            Max: {side === 'BUY' ? maxBuy : maxSell}
+          </button>
+        </div>
+        <input type="number" min="1" value={qty} onChange={e => setQty(e.target.value)} placeholder="0"
+          className="w-full mt-1 bg-terminal-bg border border-terminal-border rounded-xl px-3 py-2 font-mono text-sm focus:outline-none focus:border-accent/50" />
+      </div>
+
+      {total > 0 && (
+        <div className="flex justify-between text-xs">
+          <span className="text-terminal-muted">Total</span>
+          <span className="font-mono font-semibold">${formatPrice(total)}</span>
+        </div>
+      )}
+
+      {error && <p className="text-[10px] text-loss bg-loss/10 rounded-xl p-2">{error}</p>}
+      {success && <p className="text-[10px] text-gain bg-gain/10 rounded-xl p-2">{success}</p>}
+
+      <button onClick={handleTrade} disabled={!price || !qty}
+        className={`w-full py-2.5 rounded-xl font-semibold text-sm transition-all disabled:opacity-30 ${
+          side==='BUY'?'bg-gain hover:bg-gain/90 text-white':'bg-loss hover:bg-loss/90 text-white'
+        }`}
+      >{side==='BUY'?'Buy':'Sell'} {symbol}</button>
     </div>
   )
 }

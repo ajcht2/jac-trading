@@ -193,7 +193,7 @@ export default function Chart({ data, range }) {
           <span className="text-terminal-muted">Hover over chart for details</span>
         )}
       </div>
-      <div ref={containerRef} className="w-full" style={{ height: '500px' }} />
+      <div ref={containerRef} className="w-full" style={{ height: '600px' }} />
     </div>
   )
 }

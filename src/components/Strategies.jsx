@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BookOpen, TrendingUp, TrendingDown, ArrowLeftRight, Zap, ChevronDown, ChevronUp, ArrowRight } from 'lucide-react'
+import { BookOpen, TrendingUp, ArrowLeftRight, Zap, ChevronDown, ChevronUp, ArrowRight, Target, AlertTriangle, Building2, Calculator } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 const STRATEGIES = [
@@ -7,54 +7,46 @@ const STRATEGIES = [
     id: 'sma_crossover',
     name: 'Moving Average Crossover',
     icon: TrendingUp,
-    color: 'text-blue-400',
-    bgColor: 'bg-blue-400/10',
-    borderColor: 'border-blue-400/20',
+    color: '#3b82f6',
     tagline: 'Trend-following strategy using dual moving averages',
     summary: 'One of the most widely used strategies in quantitative finance. It identifies trend changes by comparing two moving averages of different periods — when the faster one crosses above the slower one, it signals a potential uptrend.',
     sections: [
       {
         title: 'How It Works',
-        content: `The strategy computes two Simple Moving Averages (SMA) on the closing price of an asset:
-
-• A **short-period SMA** (e.g. 10 days) which reacts quickly to price changes
-• A **long-period SMA** (e.g. 30 days) which smooths out noise and reflects the broader trend
-
-When the short SMA crosses **above** the long SMA, this is called a **Golden Cross** — it indicates that recent momentum is turning positive relative to the longer-term trend. The algorithm generates a **BUY** signal.
-
-When the short SMA crosses **below** the long SMA, this is called a **Death Cross** — it signals that short-term momentum is weakening. The algorithm generates a **SELL** signal.`
+        icon: Target,
+        content: [
+          { type: 'text', value: 'The strategy computes two Simple Moving Averages (SMA) on the closing price:' },
+          { type: 'highlight', items: [
+            { label: 'Short SMA', desc: '(e.g. 10 days) — reacts quickly to price changes' },
+            { label: 'Long SMA', desc: '(e.g. 30 days) — smooths out noise, reflects broader trend' },
+          ]},
+          { type: 'signal', buy: 'Short SMA crosses ABOVE long SMA (Golden Cross)', sell: 'Short SMA crosses BELOW long SMA (Death Cross)' },
+        ],
       },
       {
-        title: 'Mathematical Foundation',
-        content: `The Simple Moving Average for period *n* at time *t* is defined as:
-
-**SMA(n, t) = (1/n) × Σ P(t-i)** for i = 0 to n-1
-
-Where P(t) is the closing price at time t.
-
-The signal function is:
-• If SMA(short, t) > SMA(long, t) AND SMA(short, t-1) ≤ SMA(long, t-1) → **BUY**
-• If SMA(short, t) < SMA(long, t) AND SMA(short, t-1) ≥ SMA(long, t-1) → **SELL**`
+        title: 'The Math',
+        icon: Calculator,
+        content: [
+          { type: 'formula', value: 'SMA(n, t) = (1/n) × Σ Price(t-i)  for i = 0 to n-1' },
+          { type: 'text', value: 'The signal triggers on the crossover moment — when the relationship between the two SMAs flips.' },
+        ],
       },
       {
-        title: 'Strengths & Weaknesses',
-        content: `**Strengths:**
-• Simple to implement and understand
-• Effective in strong trending markets (captures the "meat" of a trend)
-• Reduces emotional decision-making with clear, mechanical signals
-• Parameters are easy to optimise through backtesting
-
-**Weaknesses:**
-• Lagging indicator — by definition, it reacts after the trend has already started
-• Generates false signals (whipsaws) in sideways/choppy markets
-• Does not account for volume, volatility, or market regime
-• Performance is highly sensitive to period selection`
+        title: 'Strengths & Risks',
+        icon: AlertTriangle,
+        content: [
+          { type: 'proscons',
+            pros: ['Simple and mechanical — removes emotion', 'Effective in strong trending markets', 'Easy to optimise via backtesting'],
+            cons: ['Lagging indicator — reacts after trend starts', 'False signals in sideways markets (whipsaws)', 'Sensitive to period selection'],
+          },
+        ],
       },
       {
         title: 'Real-World Usage',
-        content: `The SMA crossover is used extensively in institutional trading, often as a component of larger, multi-factor models. The 50/200-day crossover is particularly watched on Wall Street — a Golden Cross on the S&P 500 frequently makes financial headlines.
-
-Many hedge funds use Exponential Moving Averages (EMA) instead of SMA for faster signal generation. The core principle remains the same — momentum confirmation through moving average relationships.`
+        icon: Building2,
+        content: [
+          { type: 'text', value: 'The 50/200-day crossover is watched across Wall Street — a Golden Cross on the S&P 500 makes headlines. Many hedge funds use Exponential Moving Averages (EMA) for faster signals. The core principle remains the same: momentum confirmation through moving average relationships.' },
+        ],
       },
     ],
   },
@@ -62,61 +54,44 @@ Many hedge funds use Exponential Moving Averages (EMA) instead of SMA for faster
     id: 'rsi',
     name: 'RSI Mean Reversion',
     icon: ArrowLeftRight,
-    color: 'text-purple-400',
-    bgColor: 'bg-purple-400/10',
-    borderColor: 'border-purple-400/20',
+    color: '#a855f7',
     tagline: 'Counter-trend strategy exploiting oversold and overbought conditions',
-    summary: 'Based on the premise that prices tend to revert to their mean after extreme moves. The Relative Strength Index (RSI) quantifies momentum on a 0–100 scale, identifying when an asset is "too cheap" or "too expensive" relative to recent history.',
+    summary: 'Based on the premise that prices revert to their mean after extreme moves. The RSI quantifies momentum on a 0–100 scale, identifying when an asset is "too cheap" or "too expensive" relative to recent history.',
     sections: [
       {
         title: 'How It Works',
-        content: `The RSI measures the magnitude of recent price gains versus losses over a specified period (typically 14 days).
-
-When RSI drops **below 30**, the asset is considered **oversold** — the selling pressure has been excessive, and a rebound is statistically likely. The algorithm generates a **BUY** signal.
-
-When RSI rises **above 70**, the asset is considered **overbought** — buying enthusiasm has pushed prices too far, too fast. The algorithm generates a **SELL** signal.
-
-This is a **mean reversion** strategy — it bets that extreme moves will correct back toward the average, rather than continuing indefinitely.`
+        icon: Target,
+        content: [
+          { type: 'text', value: 'The RSI measures the magnitude of recent gains vs losses over a period (typically 14 days).' },
+          { type: 'signal', buy: 'RSI drops below 30 (oversold — too much selling pressure, rebound likely)', sell: 'RSI rises above 70 (overbought — too much buying enthusiasm)' },
+          { type: 'text', value: 'This is a mean reversion strategy — it bets that extreme moves will correct back toward the average.' },
+        ],
       },
       {
-        title: 'Mathematical Foundation',
-        content: `RSI is calculated in two steps:
-
-**Step 1:** Compute the average gain and average loss over *n* periods:
-• Average Gain = Sum of gains / n
-• Average Loss = Sum of losses / n
-
-**Step 2:** Calculate the Relative Strength and RSI:
-• RS = Average Gain / Average Loss
-• **RSI = 100 - (100 / (1 + RS))**
-
-After the initial calculation, a smoothed (Wilder's) method is used:
-• Avg Gain = [(Previous Avg Gain × (n-1)) + Current Gain] / n
-• Avg Loss = [(Previous Avg Loss × (n-1)) + Current Loss] / n
-
-This smoothing makes RSI less volatile and more reliable than a simple ratio.`
+        title: 'The Math',
+        icon: Calculator,
+        content: [
+          { type: 'formula', value: 'RS = Average Gain / Average Loss' },
+          { type: 'formula', value: 'RSI = 100 - (100 / (1 + RS))' },
+          { type: 'text', value: 'After the initial calculation, Wilder\'s smoothing method is used: each new average incorporates the previous average, making RSI less volatile and more reliable.' },
+        ],
       },
       {
-        title: 'Strengths & Weaknesses',
-        content: `**Strengths:**
-• Effective in range-bound markets where prices oscillate
-• Clear, quantitative thresholds (30/70) for entry and exit
-• Well-established indicator with decades of academic research
-• Can be combined with other indicators for confirmation
-
-**Weaknesses:**
-• Fails in strong trending markets — RSI can stay overbought/oversold for extended periods during powerful trends
-• The 30/70 thresholds are arbitrary and may need adjustment per asset
-• Pure mean reversion ignores fundamental catalysts (earnings, news)
-• "Catching a falling knife" risk — buying oversold assets that continue falling`
+        title: 'Strengths & Risks',
+        icon: AlertTriangle,
+        content: [
+          { type: 'proscons',
+            pros: ['Effective in range-bound markets', 'Clear quantitative thresholds (30/70)', 'Decades of academic research backing'],
+            cons: ['Fails in strong trends — RSI can stay overbought for weeks', '"Catching a falling knife" risk', 'Thresholds may need adjustment per asset'],
+          },
+        ],
       },
       {
         title: 'Real-World Usage',
-        content: `RSI was developed by J. Welles Wilder Jr. in 1978 and remains one of the most popular technical indicators globally. It's a standard component of Bloomberg Terminal and Reuters Eikon displays.
-
-In practice, traders often use RSI in conjunction with other signals — for example, only buying when RSI is oversold AND price is near a support level. Some quant funds use RSI divergence (price making new lows while RSI makes higher lows) as a more sophisticated entry signal.
-
-Market makers and options traders frequently use RSI to time delta hedging adjustments.`
+        icon: Building2,
+        content: [
+          { type: 'text', value: 'Developed by J. Welles Wilder Jr. in 1978, RSI remains one of the most popular indicators globally. It\'s standard on Bloomberg and Reuters terminals. Traders often combine RSI with support levels — only buying when RSI is oversold AND price is near support. Options traders use RSI divergence for timing delta hedges.' },
+        ],
       },
     ],
   },
@@ -124,70 +99,48 @@ Market makers and options traders frequently use RSI to time delta hedging adjus
     id: 'pairs',
     name: 'Pairs Trading / Statistical Arbitrage',
     icon: ArrowLeftRight,
-    color: 'text-emerald-400',
-    bgColor: 'bg-emerald-400/10',
-    borderColor: 'border-emerald-400/20',
+    color: '#10b981',
     tagline: 'Market-neutral strategy exploiting price divergence between correlated assets',
-    summary: 'A market-neutral strategy that identifies two historically correlated securities and trades the spread between them. When the spread diverges from its historical mean, the strategy goes long on the underperformer and short on the outperformer, betting on convergence.',
+    summary: 'A market-neutral strategy that identifies two correlated securities and trades the spread between them. When the spread diverges, go long the underperformer and short the outperformer, betting on convergence.',
     sections: [
       {
         title: 'How It Works',
-        content: `Pairs trading operates on a simple but powerful principle: two assets that historically move together should continue to do so. When they temporarily diverge, it creates an opportunity.
-
-**Step 1: Pair Selection**
-Identify two assets with a strong historical correlation (e.g. Coca-Cola & Pepsi, Goldman Sachs & Morgan Stanley, or two ETFs tracking similar sectors).
-
-**Step 2: Compute the Spread**
-Calculate the ratio or difference between the two prices over time. Compute the mean and standard deviation of this spread.
-
-**Step 3: Signal Generation**
-• When the spread exceeds +2 standard deviations from its mean → **SHORT the outperformer, LONG the underperformer**
-• When the spread drops below -2 standard deviations → **LONG the outperformer, SHORT the underperformer**
-• When the spread returns to the mean → **CLOSE both positions** (profit captured)
-
-Because you're simultaneously long and short, the strategy is **market-neutral** — it profits regardless of whether the overall market goes up or down.`
+        icon: Target,
+        content: [
+          { type: 'highlight', items: [
+            { label: 'Step 1: Pair Selection', desc: 'Find two assets with strong correlation (e.g. Coca-Cola & Pepsi)' },
+            { label: 'Step 2: Compute Spread', desc: 'Calculate the ratio between prices, track mean and standard deviation' },
+            { label: 'Step 3: Trade Divergence', desc: 'When spread exceeds ±2 std deviations, trade the convergence' },
+          ]},
+          { type: 'signal', buy: 'Spread > +2σ → Short outperformer, Long underperformer', sell: 'Spread returns to mean → Close both positions (profit)' },
+          { type: 'text', value: 'Because you\'re simultaneously long and short, the strategy is market-neutral — it profits regardless of market direction.' },
+        ],
       },
       {
-        title: 'Mathematical Foundation',
-        content: `The spread between assets A and B can be defined as:
-
-**Spread(t) = Price_A(t) - β × Price_B(t)**
-
-Where β (beta) is the hedge ratio, estimated via linear regression:
-**β = Cov(A, B) / Var(B)**
-
-The z-score of the spread standardises it:
-**z(t) = (Spread(t) - μ_spread) / σ_spread**
-
-Trading signals:
-• z(t) > +2.0 → Short A, Long B
-• z(t) < -2.0 → Long A, Short B
-• |z(t)| < 0.5 → Close positions
-
-More sophisticated approaches use **cointegration** (Engle-Granger test) rather than simple correlation, as cointegration is a stronger statistical relationship that implies a long-run equilibrium.`
+        title: 'The Math',
+        icon: Calculator,
+        content: [
+          { type: 'formula', value: 'Spread(t) = Price_A(t) - β × Price_B(t)' },
+          { type: 'formula', value: 'z-score = (Spread - μ) / σ' },
+          { type: 'text', value: 'Where β is the hedge ratio from linear regression. Sophisticated approaches use cointegration (Engle-Granger test) rather than correlation, as it implies a long-run equilibrium.' },
+        ],
       },
       {
-        title: 'Strengths & Weaknesses',
-        content: `**Strengths:**
-• Market-neutral — generates returns independent of market direction
-• Statistically grounded with well-defined entry/exit criteria
-• Lower drawdowns than directional strategies
-• Particularly effective during periods of high volatility
-
-**Weaknesses:**
-• Requires significant capital (two simultaneous positions)
-• Correlations can break down permanently (structural changes, M&A, regulatory shifts)
-• Short-selling constraints and borrowing costs
-• Spread may widen further before reverting — requires careful position sizing
-• High transaction costs from frequent rebalancing`
+        title: 'Strengths & Risks',
+        icon: AlertTriangle,
+        content: [
+          { type: 'proscons',
+            pros: ['Market-neutral — profits in any market', 'Statistically grounded entry/exit criteria', 'Lower drawdowns than directional strategies'],
+            cons: ['Requires significant capital (two positions)', 'Correlations can break permanently', 'Short-selling costs and constraints'],
+          },
+        ],
       },
       {
         title: 'Real-World Usage',
-        content: `Pairs trading was pioneered at Morgan Stanley in the 1980s by Nunzio Tartaglia's quantitative group, and has since become a cornerstone of statistical arbitrage desks at major hedge funds.
-
-Renaissance Technologies, DE Shaw, and Two Sigma are known to employ variants of this strategy at massive scale — often trading hundreds of pairs simultaneously across global equity markets.
-
-In practice, modern stat arb extends beyond simple pairs to "baskets" of correlated assets, using principal component analysis (PCA) and machine learning to identify and trade complex mean-reverting relationships across entire sectors.`
+        icon: Building2,
+        content: [
+          { type: 'text', value: 'Pioneered at Morgan Stanley in the 1980s by Nunzio Tartaglia\'s quant group. Renaissance Technologies, DE Shaw, and Two Sigma employ variants at massive scale — trading hundreds of pairs simultaneously. Modern stat arb extends to "baskets" using PCA and machine learning.' },
+        ],
       },
     ],
   },
@@ -195,71 +148,46 @@ In practice, modern stat arb extends beyond simple pairs to "baskets" of correla
     id: 'momentum',
     name: 'Momentum Strategy',
     icon: Zap,
-    color: 'text-orange-400',
-    bgColor: 'bg-orange-400/10',
-    borderColor: 'border-orange-400/20',
-    tagline: 'Trend-following strategy based on the persistence of recent returns',
-    summary: 'Momentum strategies exploit one of the most robust anomalies in financial markets: assets that have performed well recently tend to continue performing well, and vice versa. This "momentum effect" has been documented across asset classes, time periods, and geographies.',
+    color: '#f97316',
+    tagline: 'Trend-following based on the persistence of recent returns',
+    summary: 'Assets that performed well recently tend to continue performing well. This "momentum effect" is one of the most robust anomalies in finance, documented across asset classes, time periods, and geographies.',
     sections: [
       {
         title: 'How It Works',
-        content: `The strategy ranks assets by their recent performance (typically over 3-12 months) and takes long positions in the top performers while avoiding (or shorting) the worst performers.
-
-**Step 1: Compute Returns**
-Calculate the total return of each asset over a lookback period (e.g. past 6 months), often excluding the most recent month to avoid short-term reversal effects.
-
-**Step 2: Rank & Select**
-Rank all assets by their lookback return. Select the top decile (or quintile) for the long portfolio.
-
-**Step 3: Rebalance**
-Periodically (e.g. monthly) re-rank and rebalance. Sell assets that have dropped out of the top tier, buy new entries.
-
-The key insight is that **trends persist** due to behavioural biases (anchoring, herding, underreaction to information) and institutional flows (index rebalancing, forced buying/selling).`
+        icon: Target,
+        content: [
+          { type: 'highlight', items: [
+            { label: 'Compute Returns', desc: 'Calculate total return over lookback period (e.g. past 6 months)' },
+            { label: 'Rank & Select', desc: 'Rank all assets by return, select top performers' },
+            { label: 'Rebalance', desc: 'Monthly re-rank, sell dropouts, buy new entries' },
+          ]},
+          { type: 'text', value: 'Trends persist due to behavioural biases (anchoring, herding, underreaction) and institutional flows (index rebalancing, forced buying/selling).' },
+        ],
       },
       {
-        title: 'Mathematical Foundation',
-        content: `The momentum signal for asset *i* at time *t* with lookback period *L* is:
-
-**MOM(i, t) = [P(i, t-1) / P(i, t-L)] - 1**
-
-Note: t-1 (not t) is used to skip the most recent period, avoiding the "short-term reversal" effect documented by Jegadeesh (1990).
-
-Portfolio construction:
-• **Long portfolio**: Assets where MOM(i, t) is in the top percentile
-• Weighting can be equal-weight or signal-weighted: **w(i) = MOM(i, t) / Σ MOM(j, t)**
-
-Risk-adjusted momentum (used by sophisticated funds):
-**Risk-Adj MOM(i, t) = MOM(i, t) / σ(i, t)**
-
-Where σ is the rolling volatility, ensuring the strategy doesn't overweight highly volatile assets.`
+        title: 'The Math',
+        icon: Calculator,
+        content: [
+          { type: 'formula', value: 'MOM(i, t) = [Price(i, t-1) / Price(i, t-L)] - 1' },
+          { type: 'text', value: 'Note: t-1 (not t) skips the most recent period, avoiding the "short-term reversal" effect (Jegadeesh, 1990). Risk-adjusted momentum divides by rolling volatility to avoid overweighting volatile assets.' },
+        ],
       },
       {
-        title: 'Strengths & Weaknesses',
-        content: `**Strengths:**
-• One of the most well-documented anomalies in finance (Jegadeesh & Titman, 1993)
-• Works across asset classes: equities, bonds, currencies, commodities
-• Can be combined with value strategies for enhanced risk-adjusted returns
-• Captures persistent behavioural biases that are unlikely to be fully arbitraged away
-
-**Weaknesses:**
-• Subject to sharp **momentum crashes** — sudden reversals that can wipe out months of gains (e.g. March 2009, during market regime changes)
-• High turnover and transaction costs from frequent rebalancing
-• Crowded trade — as more participants adopt momentum strategies, the edge may diminish
-• Poor performance in trendless, choppy markets
-• Tax-inefficient due to short holding periods`
+        title: 'Strengths & Risks',
+        icon: AlertTriangle,
+        content: [
+          { type: 'proscons',
+            pros: ['Most documented anomaly in finance (Jegadeesh & Titman, 1993)', 'Works across equities, bonds, currencies, commodities', 'Captures persistent behavioural biases'],
+            cons: ['Subject to sharp momentum crashes (e.g. March 2009)', 'High turnover and transaction costs', 'Crowded trade — edge may diminish'],
+          },
+        ],
       },
       {
         title: 'Real-World Usage',
-        content: `Momentum is a foundational factor in modern quantitative finance. It's one of the "Big Five" risk factors in the Fama-French model (alongside market, size, value, and profitability).
-
-AQR Capital Management, founded by Cliff Asness, has published extensively on momentum and manages billions in momentum-based strategies. Their flagship "time-series momentum" approach applies the concept across 60+ global futures markets.
-
-In practice, most institutional momentum strategies include:
-• **Crash protection**: reducing exposure when cross-sectional dispersion spikes
-• **Sector neutrality**: ensuring the portfolio isn't just a bet on one sector
-• **Volatility scaling**: dynamically adjusting position sizes based on realised volatility
-
-The strategy's persistence is often attributed to the "limits of arbitrage" — even when traders recognise the anomaly, capital constraints, career risk, and behavioural biases prevent them from fully eliminating it.`
+        icon: Building2,
+        content: [
+          { type: 'text', value: 'Momentum is a Fama-French "Big Five" factor. AQR Capital Management manages billions in momentum strategies across 60+ global futures markets. Institutional approaches include crash protection (reducing exposure when dispersion spikes), sector neutrality, and volatility scaling.' },
+        ],
       },
     ],
   },
@@ -273,12 +201,9 @@ export default function Strategies() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold flex items-center gap-2">
-            <BookOpen size={22} className="text-accent" />
-            Trading Strategies
+            <BookOpen size={22} className="text-accent" /> Trading Strategies
           </h1>
-          <p className="text-sm text-terminal-muted mt-1">
-            In-depth explanations of the algorithms powering the trading bot
-          </p>
+          <p className="text-sm text-terminal-muted mt-1">In-depth explanations of the algorithms powering the trading bot</p>
         </div>
         <Link to="/bot" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent/10 text-accent text-sm font-medium hover:bg-accent/20 transition-colors">
           Try in Bot <ArrowRight size={14} />
@@ -291,25 +216,18 @@ export default function Strategies() {
           const isOpen = expanded === strat.id
 
           return (
-            <div key={strat.id} className={`panel transition-all ${isOpen ? `border ${strat.borderColor}` : ''}`}>
+            <div key={strat.id} className="panel transition-all overflow-hidden" style={isOpen ? { borderColor: strat.color + '40' } : {}}>
               {/* Header */}
-              <button
-                onClick={() => setExpanded(isOpen ? null : strat.id)}
-                className="w-full text-left p-5 flex items-start gap-4"
-              >
-                <div className={`p-2.5 rounded-xl ${strat.bgColor} shrink-0 mt-0.5`}>
-                  <Icon size={20} className={strat.color} />
+              <button onClick={() => setExpanded(isOpen ? null : strat.id)} className="w-full text-left p-5 flex items-start gap-4">
+                <div className="p-2.5 rounded-xl shrink-0 mt-0.5" style={{ backgroundColor: strat.color + '15' }}>
+                  <Icon size={20} style={{ color: strat.color }} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h2 className="text-lg font-bold">{strat.name}</h2>
                   <p className="text-sm text-terminal-muted mt-0.5">{strat.tagline}</p>
-                  {!isOpen && (
-                    <p className="text-sm text-terminal-muted mt-2 line-clamp-2">{strat.summary}</p>
-                  )}
+                  {!isOpen && <p className="text-sm text-terminal-muted mt-2 line-clamp-2">{strat.summary}</p>}
                 </div>
-                <div className="shrink-0 mt-1">
-                  {isOpen ? <ChevronUp size={18} className="text-terminal-muted" /> : <ChevronDown size={18} className="text-terminal-muted" />}
-                </div>
+                {isOpen ? <ChevronUp size={18} className="text-terminal-muted shrink-0 mt-1" /> : <ChevronDown size={18} className="text-terminal-muted shrink-0 mt-1" />}
               </button>
 
               {/* Content */}
@@ -317,47 +235,95 @@ export default function Strategies() {
                 <div className="px-5 pb-6 space-y-6">
                   {/* Summary */}
                   <div className="pl-14">
-                    <p className="text-sm leading-relaxed text-terminal-text">{strat.summary}</p>
+                    <p className="text-sm leading-relaxed">{strat.summary}</p>
                   </div>
 
                   {/* Sections */}
-                  {strat.sections.map((section, i) => (
-                    <div key={i} className="pl-14">
-                      <h3 className={`text-sm font-bold uppercase tracking-wider ${strat.color} mb-3`}>
-                        {section.title}
-                      </h3>
-                      <div className="text-sm leading-relaxed text-terminal-text/90 whitespace-pre-line">
-                        {section.content.split('\n').map((line, j) => {
-                          // Bold text
-                          const parts = line.split(/(\*\*[^*]+\*\*)/g)
-                          return (
-                            <p key={j} className={line.trim() === '' ? 'h-3' : 'mb-1'}>
-                              {parts.map((part, k) => {
-                                if (part.startsWith('**') && part.endsWith('**')) {
-                                  return <strong key={k} className="text-terminal-text font-semibold">{part.slice(2, -2)}</strong>
-                                }
-                                // Italic text
-                                const italicParts = part.split(/(\*[^*]+\*)/g)
-                                return italicParts.map((ip, l) => {
-                                  if (ip.startsWith('*') && ip.endsWith('*') && !ip.startsWith('**')) {
-                                    return <em key={l} className="text-terminal-muted">{ip.slice(1, -1)}</em>
-                                  }
-                                  return <span key={l}>{ip}</span>
-                                })
-                              })}
-                            </p>
-                          )
-                        })}
+                  {strat.sections.map((section, si) => {
+                    const SIcon = section.icon
+                    return (
+                      <div key={si} className="pl-14">
+                        <h3 className="text-sm font-bold uppercase tracking-wider mb-3 flex items-center gap-2" style={{ color: strat.color }}>
+                          <SIcon size={14} /> {section.title}
+                        </h3>
+                        <div className="space-y-3">
+                          {section.content.map((block, bi) => {
+                            if (block.type === 'text') {
+                              return <p key={bi} className="text-sm leading-relaxed text-terminal-text/85">{block.value}</p>
+                            }
+                            if (block.type === 'formula') {
+                              return (
+                                <div key={bi} className="bg-terminal-bg rounded-xl px-4 py-3 font-mono text-sm border-l-2" style={{ borderColor: strat.color }}>
+                                  {block.value}
+                                </div>
+                              )
+                            }
+                            if (block.type === 'signal') {
+                              return (
+                                <div key={bi} className="grid grid-cols-2 gap-3">
+                                  <div className="bg-gain/5 border border-gain/20 rounded-xl p-3">
+                                    <p className="text-xs font-semibold text-gain mb-1">↑ BUY Signal</p>
+                                    <p className="text-xs text-terminal-text/80">{block.buy}</p>
+                                  </div>
+                                  <div className="bg-loss/5 border border-loss/20 rounded-xl p-3">
+                                    <p className="text-xs font-semibold text-loss mb-1">↓ SELL Signal</p>
+                                    <p className="text-xs text-terminal-text/80">{block.sell}</p>
+                                  </div>
+                                </div>
+                              )
+                            }
+                            if (block.type === 'highlight') {
+                              return (
+                                <div key={bi} className="space-y-2">
+                                  {block.items.map((item, ii) => (
+                                    <div key={ii} className="flex items-start gap-3 bg-terminal-bg rounded-xl p-3">
+                                      <span className="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 mt-0.5" style={{ backgroundColor: strat.color + '20', color: strat.color }}>
+                                        {ii + 1}
+                                      </span>
+                                      <div>
+                                        <span className="text-sm font-semibold">{item.label}</span>
+                                        <span className="text-sm text-terminal-muted"> — {item.desc}</span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )
+                            }
+                            if (block.type === 'proscons') {
+                              return (
+                                <div key={bi} className="grid grid-cols-2 gap-3">
+                                  <div className="space-y-1.5">
+                                    <p className="text-xs font-semibold text-gain uppercase tracking-wider">Strengths</p>
+                                    {block.pros.map((p, pi) => (
+                                      <div key={pi} className="flex items-start gap-2 text-xs text-terminal-text/80">
+                                        <span className="text-gain mt-0.5">✓</span> {p}
+                                      </div>
+                                    ))}
+                                  </div>
+                                  <div className="space-y-1.5">
+                                    <p className="text-xs font-semibold text-loss uppercase tracking-wider">Risks</p>
+                                    {block.cons.map((c, ci) => (
+                                      <div key={ci} className="flex items-start gap-2 text-xs text-terminal-text/80">
+                                        <span className="text-loss mt-0.5">✗</span> {c}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )
+                            }
+                            return null
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
 
                   {/* CTA */}
                   <div className="pl-14 pt-2">
-                    <Link to="/bot"
-                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${strat.bgColor} ${strat.color} hover:opacity-80`}
+                    <Link to="/bot" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors hover:opacity-80"
+                      style={{ backgroundColor: strat.color + '15', color: strat.color }}
                     >
-                      Test this strategy in the Bot <ArrowRight size={14} />
+                      Test this strategy <ArrowRight size={14} />
                     </Link>
                   </div>
                 </div>
