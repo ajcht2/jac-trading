@@ -1,15 +1,24 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { supabase } from '../services/supabase'
+import { supabase, isSupabaseConfigured } from '../services/supabase'
 
 const AuthContext = createContext()
+const LOCAL_KEY = 'jac_trading_user'
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  // Check for existing session on load
   useEffect(() => {
+    if (!isSupabaseConfigured) {
+      try {
+        const saved = localStorage.getItem(LOCAL_KEY)
+        if (saved) setUser(JSON.parse(saved))
+      } catch {}
+      setLoading(false)
+      return
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         setUser({
@@ -21,7 +30,6 @@ export function AuthProvider({ children }) {
       setLoading(false)
     })
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setUser({
@@ -41,12 +49,17 @@ export function AuthProvider({ children }) {
     setError('')
     const capitalizedName = name.trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')
 
+    if (!isSupabaseConfigured) {
+      const userData = { id: Date.now().toString(), name: capitalizedName, email: email.trim() }
+      setUser(userData)
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(userData))
+      return true
+    }
+
     const { data, error: authError } = await supabase.auth.signUp({
       email: email.trim(),
       password,
-      options: {
-        data: { name: capitalizedName },
-      },
+      options: { data: { name: capitalizedName } },
     })
 
     if (authError) {
@@ -58,30 +71,13 @@ export function AuthProvider({ children }) {
       return false
     }
 
-    // Create portfolio in database
     if (data.user) {
-      await supabase.from('portfolios').upsert({
-        user_id: data.user.id,
-        cash: 100000,
-        positions: {},
-        transactions: [],
-      })
-
-      // Send notification email via EmailJS (optional)
       try {
-        await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            service_id: 'YOUR_SERVICE_ID',
-            template_id: 'YOUR_TEMPLATE_ID',
-            user_id: 'YOUR_PUBLIC_KEY',
-            template_params: {
-              from_name: capitalizedName,
-              from_email: email,
-              message: `New JAC Trading user: ${capitalizedName} (${email}) joined at ${new Date().toLocaleString()}`,
-            },
-          }),
+        await supabase.from('portfolios').upsert({
+          user_id: data.user.id,
+          cash: 100000,
+          positions: {},
+          transactions: [],
         })
       } catch {}
     }
@@ -91,6 +87,12 @@ export function AuthProvider({ children }) {
 
   const signIn = async (email, password) => {
     setError('')
+
+    if (!isSupabaseConfigured) {
+      setError('Supabase not configured')
+      return false
+    }
+
     const { error: authError } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password,
@@ -108,7 +110,10 @@ export function AuthProvider({ children }) {
   }
 
   const logout = async () => {
-    await supabase.auth.signOut()
+    if (isSupabaseConfigured) {
+      await supabase.auth.signOut()
+    }
+    localStorage.removeItem(LOCAL_KEY)
     setUser(null)
   }
 

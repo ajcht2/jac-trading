@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { NavLink } from 'react-router-dom'
-import { BarChart3, ArrowLeftRight, Bot, BookOpen, RotateCcw, LogOut, Newspaper } from 'lucide-react'
+import { BarChart3, ArrowLeftRight, Bot, BookOpen, RotateCcw, LogOut, Newspaper, Trophy } from 'lucide-react'
 import { usePortfolio } from '../context/PortfolioContext'
 import { usePrices } from '../context/PriceContext'
 import { useAuth } from '../context/AuthContext'
@@ -12,6 +12,7 @@ const navItems = [
   { to: '/trade', icon: ArrowLeftRight, label: 'Paper Trade' },
   { to: '/bot', icon: Bot, label: 'Trading Bot' },
   { to: '/news', icon: Newspaper, label: 'News' },
+  { to: '/leaderboard', icon: Trophy, label: 'Leaderboard' },
   { to: '/strategies', icon: BookOpen, label: 'Strategies' },
 ]
 
@@ -20,7 +21,9 @@ function LiveValue({ value, prefix = '', className = '' }) {
   const prevRef = useRef(value)
   useEffect(() => {
     if (prevRef.current !== value && prevRef.current != null) {
-      setFlash(value > prevRef.current ? 'flash-gain' : value < prevRef.current ? 'flash-loss' : '')
+      if (!className.includes('text-accent')) {
+        setFlash(value > prevRef.current ? 'flash-gain' : value < prevRef.current ? 'flash-loss' : '')
+      }
       const t = setTimeout(() => setFlash(''), 600)
       prevRef.current = value
       return () => clearTimeout(t)
@@ -84,7 +87,7 @@ export default function Layout({ children }) {
           ))}
         </nav>
 
-        {/* Bot Status (if running) */}
+        {/* Bot Status */}
         {botActive && botConfig && (
           <div className="mx-4 mb-3 px-3 py-2.5 bg-gain/5 border border-gain/20 rounded-xl">
             <div className="flex items-center gap-2">
@@ -142,10 +145,9 @@ export default function Layout({ children }) {
         <div className="fixed inset-0 ml-64 z-0" style={{
           backgroundImage: 'url(/city-bg.jpg)',
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed',
+          backgroundPosition: 'top center',
         }}>
-          <div className="absolute inset-0 bg-terminal-bg/75" />
+          <div className="absolute inset-0 bg-terminal-bg/80" />
         </div>
         <div className="relative z-10 p-6">{children}</div>
       </main>
