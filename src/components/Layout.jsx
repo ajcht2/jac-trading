@@ -50,7 +50,7 @@ export default function Layout({ children }) {
 
   return (
     <div className="flex h-screen">
-      <aside className="w-64 bg-terminal-panel border-r border-terminal-border flex flex-col shrink-0">
+      <aside className="w-64 bg-[#111827] border-r border-terminal-border flex flex-col shrink-0 overflow-y-auto">
         {/* Logo */}
         <div className="p-5 border-b border-terminal-border">
           <div className="flex justify-center">
@@ -141,16 +141,14 @@ export default function Layout({ children }) {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-auto relative">
-        <div className="fixed inset-0 ml-64 z-0" style={{
-          backgroundImage: 'url(/city-bg.jpg)',
+      <main className="flex-1 overflow-auto p-6"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(11,14,20,0.8), rgba(11,14,20,0.8)), url(/city-bg.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'top center',
-        }}>
-          <div className="absolute inset-0 bg-terminal-bg/80" />
-        </div>
-        <div className="relative z-10 p-6">{children}</div>
-      </main>
+          backgroundAttachment: 'fixed',
+        }}
+      >{children}</main>
     </div>
   )
 }
