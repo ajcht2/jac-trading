@@ -75,6 +75,7 @@ export function AuthProvider({ children }) {
       try {
         await supabase.from('portfolios').upsert({
           user_id: data.user.id,
+          name: capitalizedName,
           cash: 100000,
           positions: {},
           transactions: [],

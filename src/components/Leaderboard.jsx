@@ -34,7 +34,7 @@ export default function Leaderboard() {
       }
 
       // Fetch user names
-      const { data: userData } = await supabase.auth.admin?.listUsers?.() || {}
+      // (name is stored in portfolios table)
 
       // Collect all unique symbols to fetch prices
       const allSymbols = new Set()
@@ -66,6 +66,7 @@ export default function Leaderboard() {
 
         return {
           userId: portfolio.user_id,
+          name: portfolio.name || 'Anonymous',
           cash,
           positionsValue,
           totalEquity,
@@ -167,7 +168,7 @@ export default function Leaderboard() {
                 </div>
                 <p className="text-2xl font-bold font-mono" style={{ color: style.color }}>#{rank + 1}</p>
                 <p className="text-sm font-medium mt-1 truncate">
-                  {player.isMe ? 'You' : `Player ${rank + 1}`}
+                  {player.isMe ? `${player.name} (You)` : player.name}
                 </p>
                 <p className="text-xl font-mono font-bold mt-2">${formatPrice(player.totalEquity)}</p>
                 <p className={`text-xs font-mono mt-1 ${player.pnl >= 0 ? 'text-gain' : 'text-loss'}`}>
@@ -220,9 +221,9 @@ export default function Leaderboard() {
                       </td>
                       <td className="py-3 px-3 font-medium">
                         {player.isMe ? (
-                          <span className="text-accent">You ⭐</span>
+                          <span className="text-accent">{player.name} ⭐</span>
                         ) : (
-                          <span className="text-terminal-text">Player {i + 1}</span>
+                          <span className="text-terminal-text">{player.name}</span>
                         )}
                       </td>
                       <td className="py-3 px-3 text-right font-mono font-bold">${formatPrice(player.totalEquity)}</td>
