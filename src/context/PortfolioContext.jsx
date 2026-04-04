@@ -96,10 +96,15 @@ export function PortfolioProvider({ children }) {
               transactions: data.transactions ?? [],
             },
           })
+          // Always update name in case it was missing
+          if (user.name && data.name !== user.name) {
+            await supabase.from('portfolios').update({ name: user.name }).eq('user_id', user.id)
+          }
         } else {
           // No portfolio yet — create one
           await supabase.from('portfolios').upsert({
             user_id: user.id,
+            name: user.name || 'Anonymous',
             cash: INITIAL_CASH,
             positions: {},
             transactions: [],

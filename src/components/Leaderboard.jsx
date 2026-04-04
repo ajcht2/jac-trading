@@ -25,7 +25,7 @@ export default function Leaderboard() {
       // Fetch all portfolios
       const { data, error } = await supabase
         .from('portfolios')
-        .select('user_id, cash, positions, updated_at')
+        .select('user_id, name, cash, positions, updated_at')
 
       if (error) {
         console.error('Leaderboard fetch error:', error)
