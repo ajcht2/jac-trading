@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { TrendingUp, TrendingDown, Clock, BarChart2, Activity, Info, ShoppingCart, ArrowUpCircle, ArrowDownCircle } from 'lucide-react'
 import Chart from './Chart'
 import TickerSearch from './TickerSearch'
 import { usePrices } from '../context/PriceContext'
 import { useAuth } from '../context/AuthContext'
 import { usePortfolio } from '../context/PortfolioContext'
-import { fetchChart, getInterval, formatPrice, formatPercent, formatNumber } from '../services/api'
+import { fetchChart, fetchQuote, getInterval, formatPrice, formatPercent, formatNumber } from '../services/api'
 
 const RANGES = ['1d', '5d', '1mo', '3mo', '6mo', '1y', '5y']
 const RANGE_LABELS = { '1d': '1D', '5d': '5D', '1mo': '1M', '3mo': '3M', '6mo': '6M', '1y': '1Y', '5y': '5Y' }
@@ -320,6 +320,9 @@ function QuickTrade({ symbol, quote }) {
   const [qty, setQty] = useState('')
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
+  const [countdown, setCountdown] = useState(0)
+  const [pendingOrder, setPendingOrder] = useState(null)
+  const countdownRef = useRef(null)
 
   const price = quote?.price
   const position = state.positions[symbol]
@@ -330,16 +333,51 @@ function QuickTrade({ symbol, quote }) {
   const handleTrade = () => {
     if (!price || !qty || Number(qty) <= 0) { setError('Enter a valid quantity'); return }
     const q = Number(qty)
-    if (side === 'BUY') {
-      if (q * price > state.cash) { setError('Insufficient funds'); return }
-      dispatch({ type: 'BUY', payload: { symbol, qty: q, price } })
-    } else {
-      if (!position || position.qty < q) { setError(`Only ${position?.qty || 0} shares`); return }
-      dispatch({ type: 'SELL', payload: { symbol, qty: q, price } })
+    if (side === 'BUY' && q * price > state.cash) { setError('Insufficient funds'); return }
+    if (side === 'SELL' && (!position || position.qty < q)) { setError(`Only ${position?.qty || 0} shares`); return }
+
+    setError('')
+    setPendingOrder({ side, symbol, qty: q })
+    setCountdown(10)
+
+    if (countdownRef.current) clearInterval(countdownRef.current)
+    countdownRef.current = setInterval(() => {
+      setCountdown(c => {
+        if (c <= 1) {
+          clearInterval(countdownRef.current)
+          countdownRef.current = null
+          executeQuickOrder(side, symbol, q)
+          return 0
+        }
+        return c - 1
+      })
+    }, 1000)
+  }
+
+  const cancelOrder = () => {
+    if (countdownRef.current) clearInterval(countdownRef.current)
+    countdownRef.current = null
+    setCountdown(0)
+    setPendingOrder(null)
+  }
+
+  const executeQuickOrder = async (orderSide, sym, quantity) => {
+    try {
+      const freshQuote = await fetchQuote(sym)
+      const freshPrice = freshQuote.price
+
+      if (orderSide === 'BUY') {
+        if (quantity * freshPrice > state.cash) { setError('Price changed — insufficient funds'); setPendingOrder(null); return }
+        dispatch({ type: 'BUY', payload: { symbol: sym, qty: quantity, price: freshPrice } })
+      } else {
+        dispatch({ type: 'SELL', payload: { symbol: sym, qty: quantity, price: freshPrice } })
+      }
+      setSuccess(`${orderSide === 'BUY' ? 'Bought' : 'Sold'} ${quantity} ${sym} @ $${formatPrice(freshPrice)}`)
+      setError(''); setQty(''); setPendingOrder(null)
+      setTimeout(() => setSuccess(''), 3000)
+    } catch {
+      setError('Failed to fetch live price'); setPendingOrder(null)
     }
-    setSuccess(`${side === 'BUY' ? 'Bought' : 'Sold'} ${q} ${symbol}`)
-    setError(''); setQty('')
-    setTimeout(() => setSuccess(''), 3000)
   }
 
   if (!symbol || !quote) return null
@@ -351,10 +389,10 @@ function QuickTrade({ symbol, quote }) {
       </h3>
 
       <div className="flex rounded-xl overflow-hidden border border-terminal-border">
-        <button onClick={() => setSide('BUY')}
+        <button onClick={() => setSide('BUY')} disabled={countdown > 0}
           className={`flex-1 py-2 text-xs font-semibold transition-all flex items-center justify-center gap-1 ${side==='BUY'?'bg-gain/20 text-gain':'text-terminal-muted'}`}
         ><ArrowUpCircle size={14}/>Buy</button>
-        <button onClick={() => setSide('SELL')}
+        <button onClick={() => setSide('SELL')} disabled={countdown > 0}
           className={`flex-1 py-2 text-xs font-semibold transition-all flex items-center justify-center gap-1 ${side==='SELL'?'bg-loss/20 text-loss':'text-terminal-muted'}`}
         ><ArrowDownCircle size={14}/>Sell</button>
       </div>
@@ -379,13 +417,13 @@ function QuickTrade({ symbol, quote }) {
             Max: {side === 'BUY' ? maxBuy : maxSell}
           </button>
         </div>
-        <input type="number" min="1" value={qty} onChange={e => setQty(e.target.value)} placeholder="0"
-          className="w-full mt-1 bg-terminal-bg border border-terminal-border rounded-xl px-3 py-2 font-mono text-sm focus:outline-none focus:border-accent/50" />
+        <input type="number" min="1" value={qty} onChange={e => setQty(e.target.value)} placeholder="0" disabled={countdown > 0}
+          className="w-full mt-1 bg-terminal-bg border border-terminal-border rounded-xl px-3 py-2 font-mono text-sm focus:outline-none focus:border-accent/50 disabled:opacity-50" />
       </div>
 
-      {total > 0 && (
+      {total > 0 && countdown === 0 && (
         <div className="flex justify-between text-xs">
-          <span className="text-terminal-muted">Total</span>
+          <span className="text-terminal-muted">Estimated Total</span>
           <span className="font-mono font-semibold">${formatPrice(total)}</span>
         </div>
       )}
@@ -393,11 +431,22 @@ function QuickTrade({ symbol, quote }) {
       {error && <p className="text-[10px] text-loss bg-loss/10 rounded-xl p-2">{error}</p>}
       {success && <p className="text-[10px] text-gain bg-gain/10 rounded-xl p-2">{success}</p>}
 
-      <button onClick={handleTrade} disabled={!price || !qty}
-        className={`w-full py-2.5 rounded-xl font-semibold text-sm transition-all disabled:opacity-30 ${
-          side==='BUY'?'bg-gain hover:bg-gain/90 text-white':'bg-loss hover:bg-loss/90 text-white'
-        }`}
-      >{side==='BUY'?'Buy':'Sell'} {symbol}</button>
+      {countdown > 0 && pendingOrder ? (
+        <div className="bg-terminal-bg rounded-xl p-3 text-center space-y-2 border border-accent/30">
+          <p className="text-[10px] text-terminal-muted uppercase">Executing in</p>
+          <p className="text-2xl font-mono font-bold text-accent">{countdown}s</p>
+          <div className="w-full bg-terminal-border rounded-full h-1">
+            <div className="bg-accent h-1 rounded-full transition-all duration-1000" style={{ width: `${(1 - countdown / 10) * 100}%` }} />
+          </div>
+          <button onClick={cancelOrder} className="text-[10px] text-loss hover:underline">Cancel</button>
+        </div>
+      ) : (
+        <button onClick={handleTrade} disabled={!price || !qty}
+          className={`w-full py-2.5 rounded-xl font-semibold text-sm transition-all disabled:opacity-30 ${
+            side==='BUY'?'bg-gain hover:bg-gain/90 text-white':'bg-loss hover:bg-loss/90 text-white'
+          }`}
+        >{side==='BUY'?'Buy':'Sell'} {symbol}</button>
+      )}
     </div>
   )
 }

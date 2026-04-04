@@ -110,6 +110,22 @@ export function AuthProvider({ children }) {
     return true
   }
 
+  const resetPassword = async (email) => {
+    setError('')
+    if (!isSupabaseConfigured) {
+      setError('Password reset requires Supabase')
+      return false
+    }
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: window.location.origin,
+    })
+    if (resetError) {
+      setError(resetError.message)
+      return false
+    }
+    return true
+  }
+
   const logout = async () => {
     if (isSupabaseConfigured) {
       await supabase.auth.signOut()
@@ -119,7 +135,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, setError, signUp, signIn, logout }}>
+    <AuthContext.Provider value={{ user, loading, error, setError, signUp, signIn, resetPassword, logout }}>
       {children}
     </AuthContext.Provider>
   )

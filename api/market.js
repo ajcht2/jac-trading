@@ -30,7 +30,7 @@ async function yf(url) {
 
 // ── Chart ──────────────────────────────
 async function handleChart(symbol, range, interval, res) {
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=${interval}&includePrePost=false`
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=${interval}&includePrePost=false&corsDomain=finance.yahoo.com&.tsrc=finance&_t=${Date.now()}`
   const response = await yf(url)
   if (!response.ok) return res.status(response.status).json({ error: `Yahoo returned ${response.status}` })
 
@@ -105,9 +105,10 @@ async function handleQuote(symbol, res) {
   })
 }
 
-// Endpoint 1: v8 chart — always works, has price but no market cap
+// Endpoint 1: v8 chart — use 1-minute interval for most real-time price
 async function fetchChartQuote(symbol) {
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=2d&interval=1d&includePrePost=false`
+  // Use 1d range with 1m interval for real-time intraday data
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1d&interval=1m&includePrePost=false`
   const r = await yf(url)
   if (!r.ok) throw new Error('chart failed')
 
@@ -119,6 +120,15 @@ async function fetchChartQuote(symbol) {
   const ts = result.timestamp || []
   const q = result.indicators?.quote?.[0] || {}
   const lastIdx = ts.length - 1
+
+  // Get today's OHLV from intraday data
+  const allHighs = (q.high || []).filter(v => v != null)
+  const allLows = (q.low || []).filter(v => v != null)
+  const allVolumes = (q.volume || []).filter(v => v != null)
+  const todayHigh = allHighs.length > 0 ? Math.max(...allHighs) : null
+  const todayLow = allLows.length > 0 ? Math.min(...allLows) : null
+  const todayVolume = allVolumes.length > 0 ? allVolumes.reduce((a, b) => a + b, 0) : null
+  const todayOpen = q.open?.[0] ?? null
 
   // Also try to get 52-week from 1y data
   let fiftyTwoWeekHigh = null, fiftyTwoWeekLow = null
@@ -139,10 +149,10 @@ async function fetchChartQuote(symbol) {
     name: meta.shortName || meta.longName || meta.symbol,
     price: meta.regularMarketPrice,
     previousClose: meta.previousClose || meta.chartPreviousClose,
-    open: lastIdx >= 0 ? q.open?.[lastIdx] : null,
-    high: lastIdx >= 0 ? q.high?.[lastIdx] : null,
-    low: lastIdx >= 0 ? q.low?.[lastIdx] : null,
-    volume: lastIdx >= 0 ? q.volume?.[lastIdx] : null,
+    open: todayOpen,
+    high: todayHigh,
+    low: todayLow,
+    volume: todayVolume,
     currency: meta.currency,
     exchange: meta.exchangeName,
     type: meta.instrumentType,

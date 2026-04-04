@@ -1,7 +1,8 @@
 const BASE = '/api/market'
 
 export async function fetchChart(symbol, range = '1mo', interval = '1d') {
-  const res = await fetch(`${BASE}?symbol=${encodeURIComponent(symbol)}&range=${range}&interval=${interval}`)
+  // Cache-bust for fresh data
+  const res = await fetch(`${BASE}?symbol=${encodeURIComponent(symbol)}&range=${range}&interval=${interval}&_t=${Date.now()}`)
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw new Error(err.error || `Failed to fetch chart: ${res.status}`)
@@ -11,7 +12,8 @@ export async function fetchChart(symbol, range = '1mo', interval = '1d') {
 }
 
 export async function fetchQuote(symbol) {
-  const res = await fetch(`${BASE}?symbol=${encodeURIComponent(symbol)}&action=quote`)
+  // Cache-bust to always get fresh price
+  const res = await fetch(`${BASE}?symbol=${encodeURIComponent(symbol)}&action=quote&_t=${Date.now()}`)
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw new Error(err.error || `Failed to fetch quote: ${res.status}`)

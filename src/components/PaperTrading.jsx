@@ -32,7 +32,10 @@ function TradeForm() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [showOwnedDropdown, setShowOwnedDropdown] = useState(false)
+  const [countdown, setCountdown] = useState(0) // 10s countdown before execution
+  const [pendingOrder, setPendingOrder] = useState(null) // { side, symbol, qty }
   const dropdownRef = useRef(null)
+  const countdownRef = useRef(null)
 
   const ownedSymbols = Object.keys(state.positions)
 
@@ -72,25 +75,78 @@ function TradeForm() {
     if (!qty || Number(qty) <= 0 || !Number.isInteger(Number(qty))) { setError('Enter a valid whole number'); return }
 
     const quantity = Number(qty)
-    const price = quote.price
     const sym = symbol.toUpperCase()
 
+    // Pre-validate before starting countdown
     if (side === 'BUY') {
-      const total = quantity * price
+      const total = quantity * quote.price
       if (total > state.cash) { setError(`Insufficient funds. Need $${formatPrice(total)}`); return }
-      dispatch({ type: 'BUY', payload: { symbol: sym, qty: quantity, price } })
-      // Register in price tracker as priority
-      watchPriority([sym])
     } else {
       const pos = state.positions[sym]
       if (!pos || pos.qty < quantity) { setError(`You only own ${pos?.qty || 0} shares`); return }
-      dispatch({ type: 'SELL', payload: { symbol: sym, qty: quantity, price } })
     }
 
-    setSuccess(`${side === 'BUY' ? 'Bought' : 'Sold'} ${quantity} ${sym} @ $${formatPrice(price)}`)
+    // Start 10s countdown
     setError('')
-    setQty('')
-    setTimeout(() => setSuccess(''), 4000)
+    setPendingOrder({ side, symbol: sym, qty: quantity })
+    setCountdown(10)
+
+    if (countdownRef.current) clearInterval(countdownRef.current)
+    countdownRef.current = setInterval(() => {
+      setCountdown(c => {
+        if (c <= 1) {
+          clearInterval(countdownRef.current)
+          countdownRef.current = null
+          // Execute after countdown
+          executeOrder(side, sym, quantity)
+          return 0
+        }
+        return c - 1
+      })
+    }, 1000)
+  }
+
+  const cancelOrder = () => {
+    if (countdownRef.current) clearInterval(countdownRef.current)
+    countdownRef.current = null
+    setCountdown(0)
+    setPendingOrder(null)
+  }
+
+  const executeOrder = async (orderSide, sym, quantity) => {
+    // Fetch the FRESHEST price right now
+    try {
+      const freshQuote = await fetchQuote(sym)
+      const freshPrice = freshQuote.price
+
+      if (orderSide === 'BUY') {
+        const total = quantity * freshPrice
+        if (total > state.cash) {
+          setError(`Price changed — insufficient funds. Need $${formatPrice(total)}`)
+          setPendingOrder(null)
+          return
+        }
+        dispatch({ type: 'BUY', payload: { symbol: sym, qty: quantity, price: freshPrice } })
+        watchPriority([sym])
+      } else {
+        const pos = state.positions[sym]
+        if (!pos || pos.qty < quantity) {
+          setError(`Position changed — you only own ${pos?.qty || 0} shares`)
+          setPendingOrder(null)
+          return
+        }
+        dispatch({ type: 'SELL', payload: { symbol: sym, qty: quantity, price: freshPrice } })
+      }
+
+      setSuccess(`${orderSide === 'BUY' ? 'Bought' : 'Sold'} ${quantity} ${sym} @ $${formatPrice(freshPrice)} (live price)`)
+      setError('')
+      setQty('')
+      setPendingOrder(null)
+      setTimeout(() => setSuccess(''), 4000)
+    } catch (err) {
+      setError('Failed to fetch live price. Try again.')
+      setPendingOrder(null)
+    }
   }
 
   const total = quote && qty ? Number(qty) * quote.price : 0
@@ -196,11 +252,28 @@ function TradeForm() {
       {error && <p className="text-xs text-loss bg-loss/10 rounded-xl p-2">{error}</p>}
       {success && <p className="text-xs text-gain bg-gain/10 rounded-xl p-2">{success}</p>}
 
-      <button onClick={handleSubmit} disabled={!quote || !qty || loading}
-        className={`w-full py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
-          side === 'BUY' ? 'bg-gain hover:bg-gain/90 text-white' : 'bg-loss hover:bg-loss/90 text-white'
-        }`}
-      >{side === 'BUY' ? 'Buy' : 'Sell'} {symbol || '...'}</button>
+      {/* Countdown Timer */}
+      {countdown > 0 && pendingOrder && (
+        <div className="bg-terminal-bg rounded-xl p-4 text-center space-y-3 border border-accent/30">
+          <p className="text-xs text-terminal-muted uppercase tracking-wider">Order executing in</p>
+          <p className="text-4xl font-mono font-bold text-accent">{countdown}s</p>
+          <p className="text-xs text-terminal-muted">
+            {pendingOrder.side} {pendingOrder.qty} {pendingOrder.symbol} at live market price
+          </p>
+          <div className="w-full bg-terminal-border rounded-full h-1.5">
+            <div className="bg-accent h-1.5 rounded-full transition-all duration-1000" style={{ width: `${(1 - countdown / 10) * 100}%` }} />
+          </div>
+          <button onClick={cancelOrder} className="text-xs text-loss hover:underline">Cancel order</button>
+        </div>
+      )}
+
+      {countdown === 0 && (
+        <button onClick={handleSubmit} disabled={!quote || !qty || loading || pendingOrder}
+          className={`w-full py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+            side === 'BUY' ? 'bg-gain hover:bg-gain/90 text-white' : 'bg-loss hover:bg-loss/90 text-white'
+          }`}
+        >{side === 'BUY' ? 'Buy' : 'Sell'} {symbol || '...'}</button>
+      )}
     </div>
   )
 }

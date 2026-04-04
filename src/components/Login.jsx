@@ -3,20 +3,25 @@ import { useAuth } from '../context/AuthContext'
 import { ArrowRight, BarChart3, Bot, Wallet, Lock, Mail, User } from 'lucide-react'
 
 export default function Login() {
-  const { signUp, signIn, error, setError } = useAuth()
-  const [mode, setMode] = useState('signup') // 'signup' or 'signin'
+  const { signUp, signIn, resetPassword, error, setError } = useAuth()
+  const [mode, setMode] = useState('signup') // 'signup', 'signin', or 'forgot'
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [signupSuccess, setSignupSuccess] = useState(false)
+  const [resetSent, setResetSent] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
     setLoading(true)
 
-    if (mode === 'signup') {
+    if (mode === 'forgot') {
+      if (!email.trim() || !email.includes('@')) { setError('Enter your email'); setLoading(false); return }
+      const success = await resetPassword(email)
+      if (success) setResetSent(true)
+    } else if (mode === 'signup') {
       if (!name.trim()) { setError('Enter your name'); setLoading(false); return }
       if (!email.trim() || !email.includes('@')) { setError('Enter a valid email'); setLoading(false); return }
       if (password.length < 6) { setError('Password must be at least 6 characters'); setLoading(false); return }
@@ -37,6 +42,7 @@ export default function Login() {
     setMode(mode === 'signup' ? 'signin' : 'signup')
     setError('')
     setSignupSuccess(false)
+    setResetSent(false)
   }
 
   return (
@@ -94,6 +100,43 @@ export default function Login() {
                 className="text-sm text-accent hover:underline mt-2"
               >Already confirmed? Sign in →</button>
             </div>
+          ) : resetSent ? (
+            <div className="text-center space-y-3 py-4">
+              <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto">
+                <Mail size={28} className="text-accent" />
+              </div>
+              <h3 className="font-semibold text-lg">Reset link sent</h3>
+              <p className="text-sm text-terminal-muted">Check your inbox at <span className="text-terminal-text font-medium">{email}</span> for a password reset link.</p>
+              <button onClick={() => { setMode('signin'); setResetSent(false); setError('') }}
+                className="text-sm text-accent hover:underline mt-2"
+              >Back to Sign In →</button>
+            </div>
+          ) : mode === 'forgot' ? (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <h2 className="text-lg font-semibold">Reset Password</h2>
+                <p className="text-sm text-terminal-muted mt-1">Enter your email and we'll send you a reset link</p>
+              </div>
+              <div>
+                <label className="text-xs text-terminal-muted uppercase tracking-wider">Email</label>
+                <div className="relative mt-1.5">
+                  <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-terminal-muted" />
+                  <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                    placeholder="you@email.com" autoFocus
+                    className="w-full bg-terminal-bg border border-terminal-border rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all"
+                  />
+                </div>
+              </div>
+              {error && <p className="text-xs text-loss bg-loss/10 rounded-xl p-3">{error}</p>}
+              <button type="submit" disabled={loading}
+                className="w-full py-3 rounded-xl bg-accent hover:bg-accent/90 text-white font-semibold text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {loading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <>Send Reset Link <ArrowRight size={16} /></>}
+              </button>
+              <p className="text-center text-xs text-terminal-muted">
+                <button type="button" onClick={() => { setMode('signin'); setError('') }} className="text-accent hover:underline">Back to Sign In</button>
+              </p>
+            </form>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -156,7 +199,10 @@ export default function Login() {
                 {mode === 'signup' ? (
                   <>Already have an account? <button type="button" onClick={switchMode} className="text-accent hover:underline">Sign in</button></>
                 ) : (
-                  <>Don't have an account? <button type="button" onClick={switchMode} className="text-accent hover:underline">Sign up</button></>
+                  <span className="space-y-2 block">
+                    <span className="block">Don't have an account? <button type="button" onClick={switchMode} className="text-accent hover:underline">Sign up</button></span>
+                    <button type="button" onClick={() => { setMode('forgot'); setError('') }} className="text-accent hover:underline block mx-auto">Forgot password?</button>
+                  </span>
                 )}
               </p>
             </form>

@@ -39,7 +39,12 @@ export default function News() {
     fetchNews()
   }, [])
 
-  const filtered = filter === 'All' ? articles : articles.filter(a => a.category === filter)
+  const filtered = (filter === 'All' ? articles : articles.filter(a => a.category === filter))
+    .sort((a, b) => {
+      if (!a.publishedAt) return 1
+      if (!b.publishedAt) return -1
+      return new Date(b.publishedAt) - new Date(a.publishedAt)
+    })
 
   const timeAgo = (dateStr) => {
     if (!dateStr) return ''
