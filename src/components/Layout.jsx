@@ -3,7 +3,8 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import {
   BarChart3, ArrowLeftRight, Bot, BookOpen, RotateCcw, LogOut,
   Newspaper, Trophy, Plus, Pencil, Trash2, Check, X, ArrowLeft,
-  ChevronDown, Layers, User as UserIcon,
+  ChevronDown, Layers, User as UserIcon, Wallet, TrendingUp, TrendingDown,
+  Sparkles,
 } from 'lucide-react'
 import { usePortfolio } from '../context/PortfolioContext'
 import { usePrices } from '../context/PriceContext'
@@ -199,67 +200,107 @@ function UserMenu({ onResetActive }) {
 }
 
 // ──────────────────────────────────────────────────────────
-// Live equity panel — sits to the left of the main content.
+// Live equity panel — three tile-style cards stacked on the left.
 // ──────────────────────────────────────────────────────────
-function LivePanel({ cash, positionsValue, totalEquity, totalPnl, totalPnlPct, hasPositions, lastUpdate, botActive, botConfig }) {
+function StatTile({ icon: Icon, label, value, accent = 'text-terminal-text', tone = 'border-terminal-border bg-terminal-panel/70', children }) {
   return (
-    <aside className="lg:w-60 lg:shrink-0 lg:sticky lg:top-[88px] lg:self-start">
-      <div className="bg-terminal-panel/70 backdrop-blur-md border border-terminal-border rounded-2xl p-4 space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-gain animate-pulse" />
-            <span className="text-[10px] text-gain font-mono uppercase font-semibold">Live</span>
-          </div>
-          {lastUpdate && (
-            <span className="text-[10px] text-terminal-muted font-mono">
-              {lastUpdate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-            </span>
-          )}
+    <div className={`backdrop-blur-md border rounded-2xl p-4 ${tone}`}>
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <Icon size={14} className={accent} />
+          <span className="text-[10px] text-terminal-muted uppercase tracking-wider font-semibold">{label}</span>
         </div>
+      </div>
+      <p className={`text-xl font-mono font-bold ${accent}`}>{value}</p>
+      {children}
+    </div>
+  )
+}
 
-        <div>
-          <p className="text-[10px] text-terminal-muted uppercase tracking-wider">Cash</p>
-          <p className="text-base font-mono font-semibold mt-0.5">
-            <LiveValue value={cash} prefix="$" />
-          </p>
+function LivePanel({ cash, positionsValue, totalEquity, totalPnl, totalPnlPct, hasPositions, lastUpdate, botActive, botConfig }) {
+  const positivePnl = totalPnl >= 0
+  const PnlIcon = positivePnl ? TrendingUp : TrendingDown
+
+  return (
+    <aside className="lg:w-64 lg:shrink-0 lg:sticky lg:top-[100px] lg:self-start space-y-3">
+      {/* Live indicator strip */}
+      <div className="flex items-center justify-between px-3 py-2 bg-terminal-panel/40 backdrop-blur border border-terminal-border rounded-xl">
+        <div className="flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-gain animate-pulse" />
+          <span className="text-[10px] text-gain font-mono uppercase font-semibold tracking-wider">Live</span>
         </div>
-
-        <div>
-          <p className="text-[10px] text-terminal-muted uppercase tracking-wider">Positions</p>
-          <p className="text-base font-mono font-semibold mt-0.5">
-            <LiveValue value={positionsValue} prefix="$" />
-          </p>
-          {hasPositions && (
-            <p className={`text-[11px] font-mono mt-0.5 ${totalPnl >= 0 ? 'text-gain' : 'text-loss'}`}>
-              {totalPnl >= 0 ? '+' : ''}{formatPrice(totalPnl)}
-            </p>
-          )}
-        </div>
-
-        <div className="pt-3 border-t border-terminal-border">
-          <p className="text-[10px] text-terminal-muted uppercase tracking-wider">Total Equity</p>
-          <p className="text-xl font-mono font-bold text-accent mt-0.5">
-            <LiveValue value={totalEquity} prefix="$" className="text-accent" />
-          </p>
-          {hasPositions && (
-            <p className={`text-[11px] font-mono mt-1 ${totalPnl >= 0 ? 'text-gain' : 'text-loss'}`}>
-              P&L: {totalPnl >= 0 ? '+' : ''}{formatPrice(totalPnl)} ({totalPnl >= 0 ? '+' : ''}{totalPnlPct.toFixed(2)}%)
-            </p>
-          )}
-        </div>
-
-        {botActive && botConfig && (
-          <div className="pt-3 border-t border-gain/20">
-            <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-gain animate-pulse" />
-              <span className="text-[10px] text-gain font-mono uppercase font-semibold">Bot Running</span>
-            </div>
-            <p className="text-[10px] text-terminal-muted mt-1 font-mono">
-              {botConfig.strategy.replace('_', ' ').toUpperCase()} · {botConfig.symbol}
-            </p>
-          </div>
+        {lastUpdate && (
+          <span className="text-[10px] text-terminal-muted font-mono">
+            {lastUpdate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+          </span>
         )}
       </div>
+
+      {/* Total Equity — hero tile */}
+      <div
+        className="backdrop-blur-md border rounded-2xl p-4 relative overflow-hidden"
+        style={{
+          borderColor: 'rgba(59,130,246,0.3)',
+          background: 'linear-gradient(135deg, rgba(59,130,246,0.12), rgba(168,85,247,0.06))',
+        }}
+      >
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <Sparkles size={14} className="text-accent" />
+            <span className="text-[10px] text-accent uppercase tracking-wider font-semibold">Total Equity</span>
+          </div>
+        </div>
+        <p className="text-2xl font-mono font-bold text-accent">
+          <LiveValue value={totalEquity} prefix="$" className="text-accent" />
+        </p>
+        {hasPositions ? (
+          <div className={`mt-2 flex items-center gap-1.5 text-xs font-mono ${positivePnl ? 'text-gain' : 'text-loss'}`}>
+            <PnlIcon size={12} />
+            <span className="font-semibold">
+              {positivePnl ? '+' : ''}{formatPrice(totalPnl)}
+            </span>
+            <span className="opacity-70">
+              ({positivePnl ? '+' : ''}{totalPnlPct.toFixed(2)}%)
+            </span>
+          </div>
+        ) : (
+          <p className="text-[11px] text-terminal-muted mt-2">No open positions</p>
+        )}
+      </div>
+
+      <StatTile
+        icon={Wallet}
+        label="Cash"
+        accent="text-gain"
+        tone="border-gain/20 bg-gain/5"
+        value={<LiveValue value={cash} prefix="$" />}
+      />
+
+      <StatTile
+        icon={BarChart3}
+        label="Positions"
+        accent="text-purple-400"
+        tone="border-purple-400/20 bg-purple-400/5"
+        value={<LiveValue value={positionsValue} prefix="$" />}
+      >
+        {hasPositions && (
+          <p className={`text-[11px] font-mono mt-1 ${positivePnl ? 'text-gain' : 'text-loss'}`}>
+            {positivePnl ? '+' : ''}{formatPrice(totalPnl)}
+          </p>
+        )}
+      </StatTile>
+
+      {botActive && botConfig && (
+        <div className="bg-gain/5 border border-gain/30 rounded-2xl p-3">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-gain animate-pulse" />
+            <span className="text-[10px] text-gain font-mono uppercase font-semibold tracking-wider">Bot Running</span>
+          </div>
+          <p className="text-[10px] text-terminal-muted mt-1 font-mono">
+            {botConfig.strategy.replace('_', ' ').toUpperCase()} · {botConfig.symbol}
+          </p>
+        </div>
+      )}
     </aside>
   )
 }
@@ -316,14 +357,14 @@ export default function Layout({ children }) {
           </div>
 
           <nav className="border-t border-terminal-border bg-terminal-panel/30">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-1 overflow-x-auto whitespace-nowrap py-1.5">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-center gap-2 sm:gap-4 overflow-x-auto whitespace-nowrap py-1.5">
               {navItems.map(({ to, icon: Icon, label }) => (
                 <NavLink
                   key={to}
                   to={to}
                   end={to === '/'}
                   className={({ isActive }) =>
-                    `flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium transition-all shrink-0 ${
+                    `flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all shrink-0 ${
                       isActive
                         ? 'bg-accent/10 text-accent border border-accent/20'
                         : 'text-terminal-muted hover:text-terminal-text hover:bg-white/5 border border-transparent'
