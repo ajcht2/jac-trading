@@ -50,7 +50,7 @@ function expandRow(row) {
 
 export default function Leaderboard() {
   const { user } = useAuth()
-  const { prices, watchSymbols } = usePrices()
+  const { prices, watchSymbols, refreshPrices } = usePrices()
   const [rawEntries, setRawEntries] = useState([])
   const [loading, setLoading] = useState(true)
   const [lastUpdate, setLastUpdate] = useState(null)
@@ -59,13 +59,15 @@ export default function Leaderboard() {
   // Pull raw rows from Supabase. Equity is NOT computed here — it's derived
   // below from `rawEntries + prices` so the leaderboard reflows live as
   // prices update (every ~5s) without needing another DB round-trip.
-  const fetchLeaderboard = async () => {
+  // We await a price refresh BEFORE flipping `loading` off so the first
+  // render of the table already has correct rankings (no flash).
+  const fetchLeaderboard = async ({ silent = false } = {}) => {
     if (!isSupabaseConfigured) {
       setLoading(false)
       return
     }
 
-    setLoading(true)
+    if (!silent) setLoading(true)
     try {
       const { data, error } = await supabase
         .from('portfolios')
@@ -73,27 +75,33 @@ export default function Leaderboard() {
 
       if (error) {
         console.error('Leaderboard fetch error:', error)
-        setLoading(false)
+        if (!silent) setLoading(false)
         return
       }
 
       const flat = (data || []).flatMap(expandRow)
       const allSymbols = new Set()
       flat.forEach(p => Object.keys(p.positions).forEach(s => allSymbols.add(s)))
-      if (allSymbols.size > 0) watchSymbols(Array.from(allSymbols))
+      if (allSymbols.size > 0) {
+        watchSymbols(Array.from(allSymbols))
+        // Fetch live prices for every symbol we just registered before
+        // unblocking the UI, so the ranking renders correct on first paint.
+        try { await refreshPrices() } catch {}
+      }
 
       setRawEntries(flat)
       setLastUpdate(new Date())
     } catch (err) {
       console.error('Leaderboard error:', err)
     }
-    setLoading(false)
+    if (!silent) setLoading(false)
   }
 
   useEffect(() => {
     fetchLeaderboard()
     // Re-pull from DB every 30s so other users' new trades show up quickly.
-    const interval = setInterval(fetchLeaderboard, 30 * 1000)
+    // Silent so we don't flash the spinner over correct data already on screen.
+    const interval = setInterval(() => fetchLeaderboard({ silent: true }), 30 * 1000)
     return () => clearInterval(interval)
   }, [])
 
