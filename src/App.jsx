@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import Layout from './components/Layout'
 import Login from './components/Login'
+import Landing from './components/Landing'
 import Onboarding from './components/Onboarding'
 import Dashboard from './components/Dashboard'
 import PaperTrading from './components/PaperTrading'
@@ -14,6 +15,7 @@ import Leaderboard from './components/Leaderboard'
 export default function App() {
   const { user, loading } = useAuth()
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [showLogin, setShowLogin] = useState(false)
 
   // Check if user has seen onboarding
   useEffect(() => {
@@ -38,7 +40,11 @@ export default function App() {
     )
   }
 
-  if (!user) return <Login />
+  if (!user) {
+    return showLogin
+      ? <Login onBack={() => setShowLogin(false)} />
+      : <Landing onGetStarted={() => setShowLogin(true)} />
+  }
 
   return (
     <>

@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { ArrowRight, BarChart3, Bot, Wallet, Lock, Mail, User } from 'lucide-react'
+import { ArrowRight, ArrowLeft, BarChart3, Bot, Wallet, Lock, Mail, User } from 'lucide-react'
 
-export default function Login() {
+export default function Login({ onBack }) {
   const { signUp, signIn, resetPassword, error, setError } = useAuth()
   const [mode, setMode] = useState('signup') // 'signup', 'signin', or 'forgot'
   const [name, setName] = useState('')
@@ -55,6 +55,16 @@ export default function Login() {
         <div className="absolute inset-0 bg-terminal-bg/70" />
       </div>
       <div className="w-full max-w-md space-y-8 relative z-10">
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-terminal-border bg-terminal-panel/60 backdrop-blur text-terminal-muted hover:text-accent hover:border-accent/30 transition-all text-xs font-medium"
+            title="Back to home"
+          >
+            <ArrowLeft size={14} /> Back to home
+          </button>
+        )}
+
         {/* Logo */}
         <div className="text-center">
           <img src="/logo.png" alt="JAC Trading" className="w-36 h-36 mx-auto rounded-2xl" style={{ backgroundColor: '#0b0e14' }} />
