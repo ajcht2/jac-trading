@@ -14,7 +14,7 @@ export default function Logo({ size = 'md', className = '', subtitle = false }) 
   return (
     <span className={`inline-flex flex-col items-center leading-none ${className}`}>
       <span
-        className={`font-script ${s.jac} bg-gradient-to-r from-accent via-purple-400 to-gain bg-clip-text text-transparent`}
+        className={`font-script ${s.jac} text-terminal-text`}
         style={{ paddingBottom: '0.15em', lineHeight: 1.1 }}
       >
         JAC&nbsp;Trading

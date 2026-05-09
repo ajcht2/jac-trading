@@ -18,7 +18,7 @@ export default {
       fontFamily: {
         mono: ['"JetBrains Mono"', '"Fira Code"', 'monospace'],
         sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
-        script: ['"Allura"', 'cursive'],
+        script: ['"Sacramento"', 'cursive'],
       },
     },
   },
