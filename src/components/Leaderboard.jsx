@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Trophy, Medal, RefreshCw, TrendingUp, TrendingDown, Crown, X, History, Wallet } from 'lucide-react'
 import { supabase, isSupabaseConfigured } from '../services/supabase'
 import { useAuth } from '../context/AuthContext'
@@ -51,11 +51,14 @@ function expandRow(row) {
 export default function Leaderboard() {
   const { user } = useAuth()
   const { prices, watchSymbols } = usePrices()
-  const [players, setPlayers] = useState([])
+  const [rawEntries, setRawEntries] = useState([])
   const [loading, setLoading] = useState(true)
   const [lastUpdate, setLastUpdate] = useState(null)
   const [selected, setSelected] = useState(null)
 
+  // Pull raw rows from Supabase. Equity is NOT computed here — it's derived
+  // below from `rawEntries + prices` so the leaderboard reflows live as
+  // prices update (every ~5s) without needing another DB round-trip.
   const fetchLeaderboard = async () => {
     if (!isSupabaseConfigured) {
       setLoading(false)
@@ -74,38 +77,12 @@ export default function Leaderboard() {
         return
       }
 
-      // Flatten rows → one entry per traded slot
       const flat = (data || []).flatMap(expandRow)
-
-      // Collect all symbols across every slot for live pricing
       const allSymbols = new Set()
       flat.forEach(p => Object.keys(p.positions).forEach(s => allSymbols.add(s)))
       if (allSymbols.size > 0) watchSymbols(Array.from(allSymbols))
 
-      // Compute equity / P&L using whatever live prices we have right now
-      const playerList = flat.map(entry => {
-        let positionsValue = 0
-        Object.entries(entry.positions).forEach(([sym, pos]) => {
-          const livePrice = prices[sym]?.price || pos.avgCost || 0
-          positionsValue += pos.qty * livePrice
-        })
-        const totalEquity = entry.cash + positionsValue
-        const pnl = totalEquity - INITIAL_CASH
-        const pnlPercent = (pnl / INITIAL_CASH) * 100
-        const numPositions = Object.keys(entry.positions).length
-        return {
-          ...entry,
-          positionsValue,
-          totalEquity,
-          pnl,
-          pnlPercent,
-          numPositions,
-          isMe: entry.userId === user?.id,
-        }
-      })
-
-      playerList.sort((a, b) => b.totalEquity - a.totalEquity)
-      setPlayers(playerList)
+      setRawEntries(flat)
       setLastUpdate(new Date())
     } catch (err) {
       console.error('Leaderboard error:', err)
@@ -115,9 +92,43 @@ export default function Leaderboard() {
 
   useEffect(() => {
     fetchLeaderboard()
-    const interval = setInterval(fetchLeaderboard, 5 * 60 * 1000)
+    // Re-pull from DB every 30s so other users' new trades show up quickly.
+    const interval = setInterval(fetchLeaderboard, 30 * 1000)
     return () => clearInterval(interval)
   }, [])
+
+  // Recompute equity / P&L / sorting on every price tick. This is what makes
+  // the leaderboard live — no manual Refresh click required.
+  const players = useMemo(() => {
+    const list = rawEntries.map(entry => {
+      let positionsValue = 0
+      Object.entries(entry.positions).forEach(([sym, pos]) => {
+        const livePrice = prices[sym]?.price || pos.avgCost || 0
+        positionsValue += pos.qty * livePrice
+      })
+      const totalEquity = entry.cash + positionsValue
+      const pnl = totalEquity - INITIAL_CASH
+      const pnlPercent = (pnl / INITIAL_CASH) * 100
+      return {
+        ...entry,
+        positionsValue,
+        totalEquity,
+        pnl,
+        pnlPercent,
+        numPositions: Object.keys(entry.positions).length,
+        isMe: entry.userId === user?.id,
+      }
+    })
+    list.sort((a, b) => b.totalEquity - a.totalEquity)
+    return list
+  }, [rawEntries, prices, user?.id])
+
+  // Keep the modal in sync with refreshed data so an open detail view
+  // updates as prices and DB data change.
+  const selectedLive = useMemo(() => {
+    if (!selected) return null
+    return players.find(p => p.userId === selected.userId && p.slotIndex === selected.slotIndex) || selected
+  }, [selected, players])
 
   const getRankStyle = (rank) => {
     if (rank === 0) return { icon: Crown, color: '#f59e0b', bg: 'bg-yellow-500/10', border: 'border-yellow-500/30' }
@@ -293,9 +304,9 @@ export default function Leaderboard() {
         )
       })()}
 
-      {selected && (
+      {selectedLive && (
         <PlayerDetailModal
-          player={selected}
+          player={selectedLive}
           prices={prices}
           onClose={() => setSelected(null)}
         />

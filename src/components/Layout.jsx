@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
-import { NavLink } from 'react-router-dom'
-import { BarChart3, ArrowLeftRight, Bot, BookOpen, RotateCcw, LogOut, Newspaper, Trophy, Plus, Pencil, Trash2, Check, X } from 'lucide-react'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
+import { BarChart3, ArrowLeftRight, Bot, BookOpen, RotateCcw, LogOut, Newspaper, Trophy, Plus, Pencil, Trash2, Check, X, ArrowLeft } from 'lucide-react'
 import { usePortfolio } from '../context/PortfolioContext'
 import { usePrices } from '../context/PriceContext'
 import { useAuth } from '../context/AuthContext'
@@ -128,6 +128,9 @@ export default function Layout({ children }) {
   const { user, logout } = useAuth()
   const { botActive, botConfig } = useBot()
   const activeSlotName = slots[activeSlot]?.name || 'Portfolio'
+  const navigate = useNavigate()
+  const location = useLocation()
+  const canGoBack = location.pathname !== '/'
 
   const symbols = Object.keys(state.positions)
   useEffect(() => { if (symbols.length > 0) watchPriority(symbols) }, [symbols.join(','), watchPriority])
@@ -240,7 +243,18 @@ export default function Layout({ children }) {
           backgroundPosition: 'top center',
           backgroundAttachment: 'fixed',
         }}
-      >{children}</main>
+      >
+        {canGoBack && (
+          <button
+            onClick={() => navigate(-1)}
+            className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-terminal-border text-terminal-muted hover:text-accent hover:border-accent/30 transition-all text-xs font-medium"
+            title="Go back"
+          >
+            <ArrowLeft size={14} /> Back
+          </button>
+        )}
+        {children}
+      </main>
     </div>
   )
 }
