@@ -6,6 +6,7 @@ import { usePrices } from '../context/PriceContext'
 import { useAuth } from '../context/AuthContext'
 import { useBot } from '../context/BotContext'
 import { formatPrice } from '../services/api'
+import Logo from './Logo'
 
 const navItems = [
   { to: '/', icon: BarChart3, label: 'Dashboard' },
@@ -146,8 +147,8 @@ export default function Layout({ children }) {
       <aside className="w-64 bg-[#111827] border-r border-terminal-border flex flex-col shrink-0 overflow-y-auto">
         {/* Logo */}
         <div className="p-5 border-b border-terminal-border">
-          <div className="flex justify-center">
-            <img src="/logo.png" alt="JAC Trading" className="w-24 h-24 rounded-2xl object-contain" style={{ backgroundColor: '#111827' }} />
+          <div className="flex justify-center py-2">
+            <Logo size="md" />
           </div>
           {user && (
             <div className="flex flex-col items-center mt-3">

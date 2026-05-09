@@ -3,6 +3,7 @@ import {
   ArrowRight, Bot, Trophy, Newspaper, Sparkles, Activity, Zap,
   Crown, Medal, Layers, Brain,
 } from 'lucide-react'
+import Logo from './Logo'
 
 // ──────────────────────────────────────────────────────────
 // Tiny live-ticker that fakes price drift so the page feels alive.
@@ -427,10 +428,7 @@ export default function Landing({ onGetStarted }) {
       <div className="relative z-10">
         {/* Top nav */}
         <nav className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
-          <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="JAC Trading" className="w-10 h-10 rounded-lg" style={{ backgroundColor: '#0b0e14' }} />
-            <span className="font-bold text-base tracking-tight">JAC Trading</span>
-          </div>
+          <Logo size="sm" />
           <button
             onClick={onGetStarted}
             className="px-4 py-2 rounded-xl bg-accent/10 hover:bg-accent/20 text-accent text-sm font-semibold transition-all border border-accent/30"
@@ -568,8 +566,8 @@ export default function Landing({ onGetStarted }) {
 
         <footer className="px-6 py-8 max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-terminal-border">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="JAC Trading" className="w-8 h-8 rounded-md" style={{ backgroundColor: '#0b0e14' }} />
-            <span className="text-xs text-terminal-muted">JAC Trading · Built at the University of Warwick</span>
+            <Logo size="xs" />
+            <span className="text-xs text-terminal-muted">· Built at the University of Warwick</span>
           </div>
           <div className="flex items-center gap-4 text-xs text-terminal-muted">
             <button onClick={onGetStarted} className="hover:text-accent transition-colors">Sign in</button>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { ArrowRight, ArrowLeft, BarChart3, Bot, Wallet, Lock, Mail, User } from 'lucide-react'
+import Logo from './Logo'
 
 export default function Login({ onBack }) {
   const { signUp, signIn, resetPassword, error, setError } = useAuth()
@@ -67,8 +68,8 @@ export default function Login({ onBack }) {
 
         {/* Logo */}
         <div className="text-center">
-          <img src="/logo.png" alt="JAC Trading" className="w-36 h-36 mx-auto rounded-2xl" style={{ backgroundColor: '#0b0e14' }} />
-          <p className="text-terminal-muted mt-3 text-sm">Paper Trading Dashboard & Championship</p>
+          <Logo size="lg" />
+          <p className="text-terminal-muted mt-4 text-sm">Paper Trading Dashboard & Championship</p>
         </div>
 
         {/* Features */}
