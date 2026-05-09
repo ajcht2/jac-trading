@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { NavLink } from 'react-router-dom'
-import { BarChart3, ArrowLeftRight, Bot, BookOpen, RotateCcw, LogOut, Newspaper, Trophy } from 'lucide-react'
+import { BarChart3, ArrowLeftRight, Bot, BookOpen, RotateCcw, LogOut, Newspaper, Trophy, Plus, Pencil, Trash2, Check, X } from 'lucide-react'
 import { usePortfolio } from '../context/PortfolioContext'
 import { usePrices } from '../context/PriceContext'
 import { useAuth } from '../context/AuthContext'
@@ -33,11 +33,101 @@ function LiveValue({ value, prefix = '', className = '' }) {
   return <span className={`${className} ${flash} transition-colors duration-200 rounded px-0.5`}>{prefix}{formatPrice(value)}</span>
 }
 
+function PortfolioSwitcher() {
+  const { slots, activeSlot, maxSlots, setActiveSlot, addSlot, renameSlot, deleteSlot } = usePortfolio()
+  const [editingIndex, setEditingIndex] = useState(null)
+  const [editName, setEditName] = useState('')
+
+  const startEdit = (index, currentName) => {
+    setEditingIndex(index)
+    setEditName(currentName)
+  }
+  const commitEdit = () => {
+    if (editingIndex != null) {
+      const trimmed = editName.trim()
+      if (trimmed) renameSlot(editingIndex, trimmed.slice(0, 20))
+    }
+    setEditingIndex(null)
+    setEditName('')
+  }
+  const cancelEdit = () => {
+    setEditingIndex(null)
+    setEditName('')
+  }
+  const handleDelete = (index, name) => {
+    if (slots.length <= 1) return
+    if (confirm(`Delete "${name}"? All positions and transactions in this portfolio will be lost.`)) {
+      deleteSlot(index)
+    }
+  }
+
+  return (
+    <div className="px-4 pt-4 pb-2 border-b border-terminal-border">
+      <p className="text-[10px] text-terminal-muted uppercase tracking-wider font-semibold mb-2">Portfolios</p>
+      <div className="space-y-1">
+        {slots.map(slot => {
+          const isActive = slot.index === activeSlot
+          const isEditing = editingIndex === slot.index
+          return (
+            <div key={slot.index} className={`group flex items-center gap-1 rounded-lg ${isActive ? 'bg-accent/10 border border-accent/30' : 'hover:bg-white/5 border border-transparent'}`}>
+              {isEditing ? (
+                <>
+                  <input
+                    autoFocus
+                    value={editName}
+                    onChange={e => setEditName(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') commitEdit(); if (e.key === 'Escape') cancelEdit() }}
+                    maxLength={20}
+                    className="flex-1 bg-terminal-bg border border-terminal-border rounded-md px-2 py-1 text-xs focus:outline-none focus:border-accent/50"
+                  />
+                  <button onClick={commitEdit} className="text-gain hover:text-gain p-1" title="Save"><Check size={12} /></button>
+                  <button onClick={cancelEdit} className="text-terminal-muted hover:text-loss p-1" title="Cancel"><X size={12} /></button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setActiveSlot(slot.index)}
+                    className={`flex-1 text-left px-2 py-1.5 text-xs font-medium truncate ${isActive ? 'text-accent' : 'text-terminal-text'}`}
+                    title={slot.name}
+                  >
+                    {slot.name}
+                  </button>
+                  <button
+                    onClick={() => startEdit(slot.index, slot.name)}
+                    className="opacity-0 group-hover:opacity-100 text-terminal-muted hover:text-accent p-1 transition-opacity"
+                    title="Rename"
+                  ><Pencil size={11} /></button>
+                  {slots.length > 1 && (
+                    <button
+                      onClick={() => handleDelete(slot.index, slot.name)}
+                      className="opacity-0 group-hover:opacity-100 text-terminal-muted hover:text-loss p-1 mr-1 transition-opacity"
+                      title="Delete portfolio"
+                    ><Trash2 size={11} /></button>
+                  )}
+                </>
+              )}
+            </div>
+          )
+        })}
+        {slots.length < maxSlots && (
+          <button
+            onClick={() => addSlot()}
+            className="w-full flex items-center gap-2 px-2 py-1.5 text-xs text-terminal-muted hover:text-accent rounded-lg border border-dashed border-terminal-border hover:border-accent/30 transition-colors"
+          >
+            <Plus size={12} /> New portfolio
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function Layout({ children }) {
-  const { state, dispatch } = usePortfolio()
+  const { state, dispatch, slots, activeSlot } = usePortfolio()
   const { prices, watchPriority, lastUpdate } = usePrices()
   const { user, logout } = useAuth()
   const { botActive, botConfig } = useBot()
+  const activeSlotName = slots[activeSlot]?.name || 'Portfolio'
 
   const symbols = Object.keys(state.positions)
   useEffect(() => { if (symbols.length > 0) watchPriority(symbols) }, [symbols.join(','), watchPriority])
@@ -67,6 +157,8 @@ export default function Layout({ children }) {
             </div>
           )}
         </div>
+
+        <PortfolioSwitcher />
 
         {/* Nav */}
         <nav className="flex-1 p-4 space-y-1">
@@ -135,7 +227,7 @@ export default function Layout({ children }) {
             )}
           </div>
 
-          <button onClick={() => { if (confirm('Reset portfolio to $100,000?')) dispatch({ type: 'FULL_RESET' }) }}
+          <button onClick={() => { if (confirm(`Reset "${activeSlotName}" to $100,000?`)) dispatch({ type: 'FULL_RESET' }) }}
             className="flex items-center gap-2 text-xs text-terminal-muted hover:text-loss transition-colors w-full mt-2"
           ><RotateCcw size={12} /> Reset Portfolio</button>
         </div>
