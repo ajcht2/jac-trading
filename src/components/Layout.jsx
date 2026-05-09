@@ -222,7 +222,7 @@ function LivePanel({ cash, positionsValue, totalEquity, totalPnl, totalPnlPct, h
   const PnlIcon = positivePnl ? TrendingUp : TrendingDown
 
   return (
-    <aside className="lg:w-64 lg:shrink-0 lg:sticky lg:top-[100px] lg:self-start space-y-3">
+    <aside className="lg:w-64 lg:shrink-0 lg:-ml-4 xl:-ml-8 space-y-3">
       {/* Live indicator strip */}
       <div className="flex items-center justify-between px-3 py-2 bg-terminal-panel/40 backdrop-blur border border-terminal-border rounded-xl">
         <div className="flex items-center gap-2">
