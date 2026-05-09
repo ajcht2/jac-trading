@@ -222,7 +222,7 @@ function LivePanel({ cash, positionsValue, totalEquity, totalPnl, totalPnlPct, h
   const PnlIcon = positivePnl ? TrendingUp : TrendingDown
 
   return (
-    <aside className="lg:w-64 lg:shrink-0 lg:-ml-4 xl:-ml-8 space-y-3">
+    <aside className="px-4 sm:px-6 mb-6 lg:px-0 lg:mb-0 lg:w-60 lg:fixed lg:top-[124px] lg:left-3 xl:left-6 lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto z-20 space-y-3">
       {/* Live indicator strip */}
       <div className="flex items-center justify-between px-3 py-2 bg-terminal-panel/40 backdrop-blur border border-terminal-border rounded-xl">
         <div className="flex items-center gap-2">
@@ -340,8 +340,9 @@ export default function Layout({ children }) {
       }} />
 
       <div className="relative z-10 flex flex-col min-h-screen">
-        {/* Top nav — 3-column row 1 (centered logo), nav links row 2 */}
-        <header className="sticky top-0 z-40 backdrop-blur-md bg-terminal-bg/70 border-b border-terminal-border">
+        {/* Top nav — 3-column row 1 (centered logo), nav links row 2.
+            Fixed (not sticky) so overscroll bounce can't shift it. */}
+        <header className="fixed top-0 inset-x-0 z-40 backdrop-blur-md bg-terminal-bg/85 border-b border-terminal-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 grid grid-cols-3 items-center gap-2">
             {/* Empty cell on the left so the logo stays optically centered */}
             <div />
@@ -382,34 +383,36 @@ export default function Layout({ children }) {
           </nav>
         </header>
 
-        {/* Body: live panel on the left, page content on the right */}
-        <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
-          <div className="flex flex-col lg:flex-row gap-6">
-            <LivePanel
-              cash={state.cash}
-              positionsValue={positionsValue}
-              totalEquity={totalEquity}
-              totalPnl={totalPnl}
-              totalPnlPct={totalPnlPct}
-              hasPositions={symbols.length > 0}
-              lastUpdate={lastUpdate}
-              botActive={botActive}
-              botConfig={botConfig}
-            />
+        {/* Body: fixed live panel on the left (lg+), main content shifted right.
+            pt clears the fixed header. */}
+        <div className="flex-1 pt-[124px] pb-6">
+          <LivePanel
+            cash={state.cash}
+            positionsValue={positionsValue}
+            totalEquity={totalEquity}
+            totalPnl={totalPnl}
+            totalPnlPct={totalPnlPct}
+            hasPositions={symbols.length > 0}
+            lastUpdate={lastUpdate}
+            botActive={botActive}
+            botConfig={botConfig}
+          />
 
-            <main className="flex-1 min-w-0">
-              {canGoBack && (
-                <button
-                  onClick={() => navigate(-1)}
-                  className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-terminal-border bg-terminal-panel/60 backdrop-blur text-terminal-muted hover:text-accent hover:border-accent/30 transition-all text-xs font-medium"
-                  title="Go back"
-                >
-                  <ArrowLeft size={14} /> Back
-                </button>
-              )}
-              {children}
-            </main>
-          </div>
+          {/* On lg+, leave room on the left for the fixed panel (panel width
+              ~240px + gap). Below lg the panel renders inline above the
+              content (no left padding needed). */}
+          <main className="px-4 sm:px-6 lg:pl-[280px] xl:pl-[300px] max-w-7xl xl:max-w-[1400px] mx-auto min-w-0">
+            {canGoBack && (
+              <button
+                onClick={() => navigate(-1)}
+                className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-terminal-border bg-terminal-panel/60 backdrop-blur text-terminal-muted hover:text-accent hover:border-accent/30 transition-all text-xs font-medium"
+                title="Go back"
+              >
+                <ArrowLeft size={14} /> Back
+              </button>
+            )}
+            {children}
+          </main>
         </div>
       </div>
     </div>
