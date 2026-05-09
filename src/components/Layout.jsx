@@ -146,9 +146,9 @@ export default function Layout({ children }) {
     <div className="flex h-screen">
       <aside className="w-64 bg-[#111827] border-r border-terminal-border flex flex-col shrink-0 overflow-y-auto">
         {/* Logo */}
-        <div className="p-5 border-b border-terminal-border">
-          <div className="flex justify-center py-2">
-            <Logo size="md" />
+        <div className="p-4 border-b border-terminal-border">
+          <div className="flex justify-center py-1">
+            <Logo size="sm" />
           </div>
           {user && (
             <div className="flex flex-col items-center mt-3">
