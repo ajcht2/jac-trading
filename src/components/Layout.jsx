@@ -199,15 +199,17 @@ function UserMenu({ onResetActive }) {
 }
 
 // ──────────────────────────────────────────────────────────
-// Live equity strip below the nav.
+// Live equity panel — sits to the left of the main content.
 // ──────────────────────────────────────────────────────────
-function LiveStrip({ cash, positionsValue, totalEquity, totalPnl, totalPnlPct, hasPositions, lastUpdate }) {
+function LivePanel({ cash, positionsValue, totalEquity, totalPnl, totalPnlPct, hasPositions, lastUpdate, botActive, botConfig }) {
   return (
-    <div className="border-b border-terminal-border bg-terminal-panel/40 backdrop-blur">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex items-center gap-4 sm:gap-6 text-xs overflow-x-auto whitespace-nowrap">
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="w-1.5 h-1.5 rounded-full bg-gain animate-pulse" />
-          <span className="text-[10px] text-gain font-mono uppercase font-semibold">Live</span>
+    <aside className="lg:w-60 lg:shrink-0 lg:sticky lg:top-[88px] lg:self-start">
+      <div className="bg-terminal-panel/70 backdrop-blur-md border border-terminal-border rounded-2xl p-4 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-gain animate-pulse" />
+            <span className="text-[10px] text-gain font-mono uppercase font-semibold">Live</span>
+          </div>
           {lastUpdate && (
             <span className="text-[10px] text-terminal-muted font-mono">
               {lastUpdate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
@@ -215,31 +217,50 @@ function LiveStrip({ cash, positionsValue, totalEquity, totalPnl, totalPnlPct, h
           )}
         </div>
 
-        <div className="flex items-center gap-1.5 shrink-0">
-          <span className="text-terminal-muted">Cash</span>
-          <span className="font-mono font-semibold"><LiveValue value={cash} prefix="$" /></span>
+        <div>
+          <p className="text-[10px] text-terminal-muted uppercase tracking-wider">Cash</p>
+          <p className="text-base font-mono font-semibold mt-0.5">
+            <LiveValue value={cash} prefix="$" />
+          </p>
         </div>
 
-        <div className="flex items-center gap-1.5 shrink-0">
-          <span className="text-terminal-muted">Positions</span>
-          <span className="font-mono font-semibold"><LiveValue value={positionsValue} prefix="$" /></span>
+        <div>
+          <p className="text-[10px] text-terminal-muted uppercase tracking-wider">Positions</p>
+          <p className="text-base font-mono font-semibold mt-0.5">
+            <LiveValue value={positionsValue} prefix="$" />
+          </p>
+          {hasPositions && (
+            <p className={`text-[11px] font-mono mt-0.5 ${totalPnl >= 0 ? 'text-gain' : 'text-loss'}`}>
+              {totalPnl >= 0 ? '+' : ''}{formatPrice(totalPnl)}
+            </p>
+          )}
         </div>
 
-        <div className="flex items-center gap-1.5 shrink-0 border-l border-terminal-border pl-4 sm:pl-6">
-          <span className="text-terminal-muted">Equity</span>
-          <span className="font-mono font-bold text-accent"><LiveValue value={totalEquity} prefix="$" className="text-accent" /></span>
+        <div className="pt-3 border-t border-terminal-border">
+          <p className="text-[10px] text-terminal-muted uppercase tracking-wider">Total Equity</p>
+          <p className="text-xl font-mono font-bold text-accent mt-0.5">
+            <LiveValue value={totalEquity} prefix="$" className="text-accent" />
+          </p>
+          {hasPositions && (
+            <p className={`text-[11px] font-mono mt-1 ${totalPnl >= 0 ? 'text-gain' : 'text-loss'}`}>
+              P&L: {totalPnl >= 0 ? '+' : ''}{formatPrice(totalPnl)} ({totalPnl >= 0 ? '+' : ''}{totalPnlPct.toFixed(2)}%)
+            </p>
+          )}
         </div>
 
-        {hasPositions && (
-          <div className={`flex items-center gap-1.5 shrink-0 font-mono ${totalPnl >= 0 ? 'text-gain' : 'text-loss'}`}>
-            <span>P&L</span>
-            <span className="font-semibold">
-              {totalPnl >= 0 ? '+' : ''}{formatPrice(totalPnl)} ({totalPnl >= 0 ? '+' : ''}{totalPnlPct.toFixed(2)}%)
-            </span>
+        {botActive && botConfig && (
+          <div className="pt-3 border-t border-gain/20">
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-gain animate-pulse" />
+              <span className="text-[10px] text-gain font-mono uppercase font-semibold">Bot Running</span>
+            </div>
+            <p className="text-[10px] text-terminal-muted mt-1 font-mono">
+              {botConfig.strategy.replace('_', ' ').toUpperCase()} · {botConfig.symbol}
+            </p>
           </div>
         )}
       </div>
-    </div>
+    </aside>
   )
 }
 
@@ -278,21 +299,31 @@ export default function Layout({ children }) {
       }} />
 
       <div className="relative z-10 flex flex-col min-h-screen">
-        {/* Top nav */}
+        {/* Top nav — 3-column row 1 (centered logo), nav links row 2 */}
         <header className="sticky top-0 z-40 backdrop-blur-md bg-terminal-bg/70 border-b border-terminal-border">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-4">
-            <NavLink to="/" className="shrink-0">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 grid grid-cols-3 items-center gap-2">
+            {/* Empty cell on the left so the logo stays optically centered */}
+            <div />
+
+            <NavLink to="/" className="justify-self-center">
               <Logo size="sm" />
             </NavLink>
 
-            <nav className="flex-1 flex items-center gap-1 overflow-x-auto whitespace-nowrap scrollbar-thin">
+            <div className="flex items-center gap-2 justify-self-end">
+              <PortfolioMenu />
+              <UserMenu onResetActive={resetActive} />
+            </div>
+          </div>
+
+          <nav className="border-t border-terminal-border bg-terminal-panel/30">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-1 overflow-x-auto whitespace-nowrap py-1.5">
               {navItems.map(({ to, icon: Icon, label }) => (
                 <NavLink
                   key={to}
                   to={to}
                   end={to === '/'}
                   className={({ isActive }) =>
-                    `flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all shrink-0 ${
+                    `flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium transition-all shrink-0 ${
                       isActive
                         ? 'bg-accent/10 text-accent border border-accent/20'
                         : 'text-terminal-muted hover:text-terminal-text hover:bg-white/5 border border-transparent'
@@ -300,56 +331,45 @@ export default function Layout({ children }) {
                   }
                 >
                   <Icon size={15} />
-                  <span className="hidden md:inline">{label}</span>
+                  <span className="hidden sm:inline">{label}</span>
                   {to === '/bot' && botActive && (
                     <span className="w-1.5 h-1.5 rounded-full bg-gain animate-pulse" title="Bot running" />
                   )}
                 </NavLink>
               ))}
-            </nav>
-
-            <div className="flex items-center gap-2 shrink-0">
-              <PortfolioMenu />
-              <UserMenu onResetActive={resetActive} />
             </div>
-          </div>
-
-          <LiveStrip
-            cash={state.cash}
-            positionsValue={positionsValue}
-            totalEquity={totalEquity}
-            totalPnl={totalPnl}
-            totalPnlPct={totalPnlPct}
-            hasPositions={symbols.length > 0}
-            lastUpdate={lastUpdate}
-          />
-
-          {botActive && botConfig && (
-            <div className="border-b border-gain/20 bg-gain/5">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 py-1.5 flex items-center gap-2 text-xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-gain animate-pulse" />
-                <span className="text-gain font-semibold">Bot Running</span>
-                <span className="text-terminal-muted font-mono">
-                  · {botConfig.strategy.replace('_', ' ').toUpperCase()} on {botConfig.symbol}
-                </span>
-              </div>
-            </div>
-          )}
+          </nav>
         </header>
 
-        {/* Main */}
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
-          {canGoBack && (
-            <button
-              onClick={() => navigate(-1)}
-              className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-terminal-border bg-terminal-panel/60 backdrop-blur text-terminal-muted hover:text-accent hover:border-accent/30 transition-all text-xs font-medium"
-              title="Go back"
-            >
-              <ArrowLeft size={14} /> Back
-            </button>
-          )}
-          {children}
-        </main>
+        {/* Body: live panel on the left, page content on the right */}
+        <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+          <div className="flex flex-col lg:flex-row gap-6">
+            <LivePanel
+              cash={state.cash}
+              positionsValue={positionsValue}
+              totalEquity={totalEquity}
+              totalPnl={totalPnl}
+              totalPnlPct={totalPnlPct}
+              hasPositions={symbols.length > 0}
+              lastUpdate={lastUpdate}
+              botActive={botActive}
+              botConfig={botConfig}
+            />
+
+            <main className="flex-1 min-w-0">
+              {canGoBack && (
+                <button
+                  onClick={() => navigate(-1)}
+                  className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-terminal-border bg-terminal-panel/60 backdrop-blur text-terminal-muted hover:text-accent hover:border-accent/30 transition-all text-xs font-medium"
+                  title="Go back"
+                >
+                  <ArrowLeft size={14} /> Back
+                </button>
+              )}
+              {children}
+            </main>
+          </div>
+        </div>
       </div>
     </div>
   )
