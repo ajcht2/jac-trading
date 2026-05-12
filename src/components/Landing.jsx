@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import {
   ArrowRight, Bot, Trophy, Newspaper, Sparkles, Activity, Zap,
   Crown, Medal, Layers, Brain, Briefcase, PiggyBank, Calculator,
-  Scale, BookOpen, FileText, Building2, DollarSign,
+  Scale, BookOpen, FileText, Building2, DollarSign, GraduationCap,
+  CheckCircle2, Youtube,
 } from 'lucide-react'
 import Logo from './Logo'
 
@@ -578,6 +579,62 @@ function MockLessons() {
   )
 }
 
+function MockCourses() {
+  const tracks = [
+    {
+      name: 'Trading & Markets',
+      color: '#3b82f6',
+      icon: BarChart3,
+      courses: [
+        { num: 1, title: 'Markets & Asset Classes',          lessons: 4 },
+        { num: 2, title: 'Equity Fundamentals',              lessons: 4 },
+        { num: 3, title: 'Technical Analysis',               lessons: 4 },
+        { num: 4, title: 'Algo Trading & Risk',              lessons: 4 },
+      ],
+    },
+    {
+      name: 'M&A & Investment Banking',
+      color: '#a855f7',
+      icon: Briefcase,
+      courses: [
+        { num: 1, title: 'Corporate Finance Foundations',    lessons: 4 },
+        { num: 2, title: 'Valuation Methods',                lessons: 4 },
+        { num: 3, title: 'M&A Process & Structuring',        lessons: 4 },
+        { num: 4, title: 'LBO & Private Equity',             lessons: 4 },
+      ],
+    },
+  ]
+  return (
+    <div className="space-y-3">
+      {tracks.map(t => {
+        const Icon = t.icon
+        return (
+          <div key={t.name} className="space-y-2">
+            <div className="flex items-center gap-2 pb-1">
+              <Icon size={14} style={{ color: t.color }} />
+              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: t.color }}>{t.name}</span>
+            </div>
+            <div className="space-y-1">
+              {t.courses.map(c => (
+                <div key={c.num} className="flex items-center gap-2 bg-terminal-bg/40 rounded-lg px-3 py-2 text-xs">
+                  <span className="w-5 h-5 rounded flex items-center justify-center font-mono font-bold text-[10px] shrink-0"
+                    style={{ backgroundColor: t.color + '20', color: t.color }}>{c.num}</span>
+                  <span className="flex-1 truncate">{c.title}</span>
+                  <span className="text-[10px] text-terminal-muted shrink-0">{c.lessons} lessons</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      })}
+      <div className="flex items-center gap-2 text-[10px] text-terminal-muted pt-2 border-t border-terminal-border">
+        <Youtube size={11} />
+        <span>Inspired by NYU Stern (Damodaran), Wharton, Yale, CFA, Wall Street Prep</span>
+      </div>
+    </div>
+  )
+}
+
 // ──────────────────────────────────────────────────────────
 // Page.
 // ──────────────────────────────────────────────────────────
@@ -647,7 +704,7 @@ export default function Landing({ onGetStarted }) {
             <div><p className="text-2xl font-mono font-bold">$100K</p><p className="text-xs text-terminal-muted">Paper cash</p></div>
             <div><p className="text-2xl font-mono font-bold">4</p><p className="text-xs text-terminal-muted">Algo strategies</p></div>
             <div><p className="text-2xl font-mono font-bold">2</p><p className="text-xs text-terminal-muted">M&amp;A tools</p></div>
-            <div><p className="text-2xl font-mono font-bold">13</p><p className="text-xs text-terminal-muted">Finance lessons</p></div>
+            <div><p className="text-2xl font-mono font-bold">32</p><p className="text-xs text-terminal-muted">Lessons</p></div>
           </div>
         </section>
 
@@ -758,6 +815,17 @@ export default function Landing({ onGetStarted }) {
           </FeatureSection>
 
           <FeatureSection
+            icon={GraduationCap}
+            eyebrow="Full curriculum"
+            accent="border-yellow-500/30 bg-yellow-500/10 text-yellow-500"
+            title="8 courses, 32 lessons — like a finance degree, free."
+            copy="A structured curriculum across two tracks: Trading & Markets (asset classes → equity analysis → technical → algo trading) and M&A & Investment Banking (corporate finance → valuation → process → LBO/PE). Each lesson has learning objectives, worked examples, and citations to NYU Stern lectures, CFA readings, Wall Street Prep, and the best YouTube channels."
+          >
+            <MockCourses />
+          </FeatureSection>
+
+          <FeatureSection
+            reverse
             icon={Newspaper}
             eyebrow="Curated news"
             accent="border-gain/30 bg-gain/10 text-gain"

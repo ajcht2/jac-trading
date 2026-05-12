@@ -4,7 +4,7 @@ import {
   BarChart3, ArrowLeftRight, Bot, BookOpen, RotateCcw, LogOut,
   Newspaper, Trophy, Plus, Pencil, Trash2, Check, X, ArrowLeft,
   ChevronDown, Layers, User as UserIcon, Wallet, TrendingUp, TrendingDown,
-  Sparkles, Briefcase, PiggyBank, Calculator,
+  Sparkles, Briefcase, PiggyBank, Calculator, GraduationCap,
 } from 'lucide-react'
 import { usePortfolio } from '../context/PortfolioContext'
 import { usePrices } from '../context/PriceContext'
@@ -31,6 +31,13 @@ const navGroups = [
       { to: '/m-and-a',     icon: Briefcase,     label: 'M&A Theory' },
       { to: '/lbo',         icon: PiggyBank,     label: 'LBO Model'  },
       { to: '/valuation',   icon: Calculator,    label: 'Valuation'  },
+    ],
+  },
+  {
+    label: 'Learn',
+    color: '#f59e0b',
+    items: [
+      { to: '/courses',     icon: GraduationCap, label: 'Courses'    },
     ],
   },
   {

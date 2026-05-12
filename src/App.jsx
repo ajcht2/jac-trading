@@ -12,6 +12,7 @@ import Strategies from './components/Strategies'
 import MergersAcquisitions from './components/MergersAcquisitions'
 import LboModel from './components/LboModel'
 import ValuationTool from './components/ValuationTool'
+import Courses from './components/Courses'
 import News from './components/News'
 import Leaderboard from './components/Leaderboard'
 
@@ -61,6 +62,7 @@ export default function App() {
           <Route path="/m-and-a" element={<MergersAcquisitions />} />
           <Route path="/lbo" element={<LboModel />} />
           <Route path="/valuation" element={<ValuationTool />} />
+          <Route path="/courses" element={<Courses />} />
           <Route path="/news" element={<News />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="*" element={<Navigate to="/" replace />} />
