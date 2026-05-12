@@ -3,7 +3,7 @@ import {
   ArrowRight, Bot, Trophy, Newspaper, Sparkles, Activity, Zap,
   Crown, Medal, Layers, Brain, Briefcase, PiggyBank, Calculator,
   Scale, BookOpen, FileText, Building2, DollarSign, GraduationCap,
-  CheckCircle2, Youtube,
+  CheckCircle2, Youtube, BarChart3,
 } from 'lucide-react'
 import Logo from './Logo'
 
