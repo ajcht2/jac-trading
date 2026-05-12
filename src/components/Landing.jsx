@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import {
   ArrowRight, Bot, Trophy, Newspaper, Sparkles, Activity, Zap,
-  Crown, Medal, Layers, Brain,
+  Crown, Medal, Layers, Brain, Briefcase, PiggyBank, Calculator,
+  Scale, BookOpen, FileText, Building2, DollarSign,
 } from 'lucide-react'
 import Logo from './Logo'
 
@@ -401,6 +402,183 @@ function FeatureSection({ icon: Icon, eyebrow, title, copy, accent, reverse, chi
 }
 
 // ──────────────────────────────────────────────────────────
+// M&A mocks
+// ──────────────────────────────────────────────────────────
+function MockLBO() {
+  const [equityPct, setEquityPct] = useState(35)
+  const [growth, setGrowth]       = useState(8)
+  const [exitMult, setExitMult]   = useState(8.5)
+
+  // simplified illustrative math:
+  const entryEV = 500
+  const entryEbitda = 70
+  const entryMult = entryEV / entryEbitda
+  const equity = entryEV * (equityPct / 100)
+  const debt = entryEV - equity
+  const years = 5
+  const exitEbitda = entryEbitda * Math.pow(1 + growth / 100, years)
+  const exitEV = exitEbitda * exitMult
+  // crude debt paydown: 60% of cumulative EBITDA
+  const totalEbitda = Array.from({ length: years }, (_, i) => entryEbitda * Math.pow(1 + growth / 100, i + 1)).reduce((a, b) => a + b, 0)
+  const debtPaid = Math.min(debt, totalEbitda * 0.30)
+  const exitDebt = Math.max(0, debt - debtPaid)
+  const exitEquity = exitEV - exitDebt
+  const moic = exitEquity / equity
+  const irr = Math.pow(exitEquity / equity, 1 / years) - 1
+
+  return (
+    <div className="space-y-3">
+      <p className="text-[10px] text-terminal-muted uppercase tracking-wider font-semibold">Sources</p>
+      <div className="grid grid-cols-2 gap-2 text-xs">
+        <div className="bg-gain/5 border border-gain/20 rounded-lg px-3 py-2">
+          <p className="text-terminal-muted">Sponsor Equity</p>
+          <p className="font-mono font-bold text-gain">${equity.toFixed(0)}M ({equityPct}%)</p>
+        </div>
+        <div className="bg-loss/5 border border-loss/20 rounded-lg px-3 py-2">
+          <p className="text-terminal-muted">Debt</p>
+          <p className="font-mono font-bold text-loss">${debt.toFixed(0)}M ({100 - equityPct}%)</p>
+        </div>
+      </div>
+
+      <div className="space-y-2 pt-1">
+        <SliderRow label="Equity %"      value={equityPct} onChange={setEquityPct} min={20} max={60} step={1} unit="%" />
+        <SliderRow label="EBITDA growth" value={growth}    onChange={setGrowth}    min={0}  max={20} step={1} unit="%" />
+        <SliderRow label="Exit multiple" value={exitMult}  onChange={setExitMult}  min={4}  max={14} step={0.5} unit="×" />
+      </div>
+
+      <div className="pt-2 border-t border-terminal-border grid grid-cols-2 gap-2">
+        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+          <p className="text-[10px] text-red-400 uppercase tracking-wider font-semibold">IRR (5y)</p>
+          <p className="text-2xl font-mono font-bold text-red-400">{(irr * 100).toFixed(1)}%</p>
+        </div>
+        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+          <p className="text-[10px] text-yellow-400 uppercase tracking-wider font-semibold">MOIC</p>
+          <p className="text-2xl font-mono font-bold text-yellow-400">{moic.toFixed(2)}×</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function SliderRow({ label, value, onChange, min, max, step, unit }) {
+  return (
+    <div>
+      <div className="flex items-center justify-between text-[10px] mb-1">
+        <span className="text-terminal-muted uppercase tracking-wider font-semibold">{label}</span>
+        <span className="font-mono font-semibold">{value}{unit}</span>
+      </div>
+      <input
+        type="range" value={value} min={min} max={max} step={step}
+        onChange={e => onChange(Number(e.target.value))}
+        className="w-full accent-accent h-1"
+      />
+    </div>
+  )
+}
+
+function MockValuation() {
+  const [revenue, setRevenue] = useState(50)
+  const [ebitda, setEbitda]   = useState(8)
+  const range = (a, b) => ({ low: a, high: b })
+  const evRev = range(revenue * 4, revenue * 9)
+  const evEb  = range(ebitda * 15, ebitda * 30)
+  const dcf   = ebitda * 22
+
+  const lo = Math.min(evRev.low, evEb.low, dcf)
+  const hi = Math.max(evRev.high, evEb.high, dcf)
+
+  return (
+    <div className="space-y-3">
+      <SliderRow label="Revenue (LTM)" value={revenue} onChange={setRevenue} min={5} max={500} step={5} unit="M$" />
+      <SliderRow label="EBITDA (LTM)"  value={ebitda}  onChange={setEbitda}  min={1} max={100} step={1} unit="M$" />
+
+      <div className="pt-2 border-t border-terminal-border space-y-2">
+        <div className="bg-terminal-bg/60 rounded-lg p-3">
+          <div className="flex items-center justify-between text-[10px] mb-1">
+            <span className="text-terminal-muted uppercase tracking-wider">EV / Revenue (SaaS comp)</span>
+            <span className="text-terminal-muted">4×–9×</span>
+          </div>
+          <p className="font-mono font-semibold text-sm">${evRev.low.toFixed(0)}M – ${evRev.high.toFixed(0)}M</p>
+        </div>
+        <div className="bg-terminal-bg/60 rounded-lg p-3">
+          <div className="flex items-center justify-between text-[10px] mb-1">
+            <span className="text-terminal-muted uppercase tracking-wider">EV / EBITDA (SaaS comp)</span>
+            <span className="text-terminal-muted">15×–30×</span>
+          </div>
+          <p className="font-mono font-semibold text-sm">${evEb.low.toFixed(0)}M – ${evEb.high.toFixed(0)}M</p>
+        </div>
+        <div className="bg-gain/5 border border-gain/20 rounded-lg p-3">
+          <p className="text-[10px] text-gain uppercase tracking-wider font-semibold">DCF (illustrative)</p>
+          <p className="font-mono font-bold text-sm text-gain">${dcf.toFixed(0)}M</p>
+        </div>
+        <div className="rounded-lg p-3 border" style={{ borderColor: 'rgba(168,85,247,0.3)', background: 'rgba(168,85,247,0.08)' }}>
+          <p className="text-[10px] text-purple-400 uppercase tracking-wider font-semibold">Football field range</p>
+          <p className="font-mono font-bold text-lg text-purple-400">${lo.toFixed(0)}M – ${hi.toFixed(0)}M</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function MockDealMarketplace() {
+  const deals = [
+    { sector: 'SaaS', name: 'CloudCore Inc.',  rev: '$12M', ebitda: '$2.8M', loc: 'London',     mult: '5.5×' },
+    { sector: 'E-Comm',  name: 'NorthShore DTC',  rev: '$28M', ebitda: '$3.2M', loc: 'Paris',      mult: '1.8×' },
+    { sector: 'Dental',  name: 'BrightSmile Group',rev: '$6M',  ebitda: '$1.4M', loc: 'Manchester', mult: '7.0×' },
+    { sector: 'Fintech', name: 'PayBridge Ltd.',   rev: '$18M', ebitda: '$4.1M', loc: 'Amsterdam',  mult: '12×' },
+  ]
+  return (
+    <div className="space-y-2">
+      <p className="text-[10px] text-terminal-muted uppercase tracking-wider font-semibold mb-1">Sample deal listings</p>
+      {deals.map((d, i) => (
+        <div key={i} className="bg-terminal-bg/40 rounded-lg px-3 py-2.5 hover:bg-terminal-bg/60 transition-colors cursor-pointer">
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-400/15 text-purple-400 shrink-0">{d.sector}</span>
+              <span className="text-xs font-semibold truncate">{d.name}</span>
+            </div>
+            <span className="text-[10px] font-mono text-yellow-400 shrink-0">{d.mult} EBITDA</span>
+          </div>
+          <div className="flex items-center gap-3 text-[10px] text-terminal-muted font-mono">
+            <span>Rev {d.rev}</span>
+            <span>·</span>
+            <span>EBITDA {d.ebitda}</span>
+            <span>·</span>
+            <span>{d.loc}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function MockLessons() {
+  const lessons = [
+    { icon: BookOpen,    title: 'Introduction to M&A',          tag: 'Fundamentals' },
+    { icon: Layers,      title: 'Stock vs Asset deal',          tag: 'Fundamentals' },
+    { icon: FileText,    title: 'The M&A Deal Process',         tag: 'Fundamentals' },
+    { icon: Calculator,  title: 'DCF Valuation',                tag: 'Valuation'    },
+    { icon: Scale,       title: 'Trading Comparables',          tag: 'Valuation'    },
+    { icon: PiggyBank,   title: 'LBO Mechanics',                tag: 'Valuation'    },
+    { icon: DollarSign,  title: 'Accretion / Dilution',         tag: 'Valuation'    },
+  ]
+  return (
+    <div className="space-y-2">
+      {lessons.map((l, i) => {
+        const Icon = l.icon
+        return (
+          <div key={i} className="flex items-center gap-3 bg-terminal-bg/40 rounded-lg px-3 py-2 text-xs">
+            <Icon size={14} className="text-accent shrink-0" />
+            <span className="flex-1 truncate font-medium">{l.title}</span>
+            <span className="text-[10px] text-terminal-muted shrink-0">{l.tag}</span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+// ──────────────────────────────────────────────────────────
 // Page.
 // ──────────────────────────────────────────────────────────
 export default function Landing({ onGetStarted }) {
@@ -440,16 +618,16 @@ export default function Landing({ onGetStarted }) {
         {/* Hero */}
         <section className="px-6 pt-12 pb-16 max-w-5xl mx-auto text-center space-y-7">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/30 text-[11px] font-semibold uppercase tracking-wider text-accent">
-            <Sparkles size={12} /> Free · No credit card · Real markets
+            <Sparkles size={12} /> Free · No credit card · Built for finance students
           </div>
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05]">
-            Trade real markets.<br />
+            The trading floor<br />
             <span className="bg-gradient-to-r from-accent via-purple-400 to-gain bg-clip-text text-transparent">
-              Risk zero dollars.
+              and the deal room.
             </span>
           </h1>
           <p className="text-lg sm:text-xl text-terminal-muted max-w-2xl mx-auto leading-relaxed">
-            $100,000 of virtual cash. Live prices on stocks &amp; crypto. Algorithmic bots, multi-portfolio strategies, and a global leaderboard — all in one terminal-grade dashboard.
+            Learn markets <em>and</em> investment banking in one place. $100K paper-trading account on one side, interactive LBO models, valuation tools and deal-process lessons on the other. Built for students aiming at S&amp;T or M&amp;A careers.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
             <button
@@ -465,10 +643,11 @@ export default function Landing({ onGetStarted }) {
               See what's inside
             </a>
           </div>
-          <div className="grid grid-cols-3 gap-4 pt-6 max-w-2xl mx-auto">
-            <div><p className="text-2xl font-mono font-bold">$100K</p><p className="text-xs text-terminal-muted">Virtual cash</p></div>
-            <div><p className="text-2xl font-mono font-bold">3</p><p className="text-xs text-terminal-muted">Portfolios</p></div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 max-w-3xl mx-auto">
+            <div><p className="text-2xl font-mono font-bold">$100K</p><p className="text-xs text-terminal-muted">Paper cash</p></div>
             <div><p className="text-2xl font-mono font-bold">4</p><p className="text-xs text-terminal-muted">Algo strategies</p></div>
+            <div><p className="text-2xl font-mono font-bold">2</p><p className="text-xs text-terminal-muted">M&amp;A tools</p></div>
+            <div><p className="text-2xl font-mono font-bold">13</p><p className="text-xs text-terminal-muted">Finance lessons</p></div>
           </div>
         </section>
 
@@ -518,6 +697,66 @@ export default function Landing({ onGetStarted }) {
             <MockLeaderboard />
           </FeatureSection>
 
+          {/* ────────── M&A SIDE ────────── */}
+          <div className="pt-12">
+            <div className="max-w-3xl mx-auto text-center space-y-3 mb-12">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-400/10 border border-purple-400/30 text-[11px] font-semibold uppercase tracking-wider text-purple-400">
+                <Briefcase size={12} /> The deal-room side
+              </div>
+              <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-[1.1]">
+                Investment banking,<br />
+                <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-accent bg-clip-text text-transparent">
+                  built for finance majors.
+                </span>
+              </h2>
+              <p className="text-base text-terminal-muted leading-relaxed">
+                The same site that lets you trade also teaches you M&amp;A. Interactive LBO and valuation tools, full deal-process lessons, and worked examples — everything you'd cover in a corporate finance course or a banking interview.
+              </p>
+            </div>
+          </div>
+
+          <FeatureSection
+            icon={PiggyBank}
+            eyebrow="LBO model"
+            accent="border-red-500/30 bg-red-500/10 text-red-400"
+            title="Build a real leveraged buyout, slide by slide."
+            copy="Drag the equity contribution, EBITDA growth and exit multiple. The model recalculates sponsor IRR and MOIC in real time, with a value-creation bridge that breaks down how much return came from leverage, growth, and multiple expansion."
+          >
+            <MockLBO />
+          </FeatureSection>
+
+          <FeatureSection
+            reverse
+            icon={Calculator}
+            eyebrow="Valuation tool"
+            accent="border-purple-400/30 bg-purple-400/10 text-purple-400"
+            title="Valuation, three methods, one football field."
+            copy="Punch in revenue and EBITDA, pick an industry. Get an instant range from trading comps (EV/Revenue, EV/EBITDA) and a quick DCF — exactly the way bankers present a target's valuation on a pitch."
+          >
+            <MockValuation />
+          </FeatureSection>
+
+          <FeatureSection
+            icon={Building2}
+            eyebrow="Deal marketplace"
+            accent="border-yellow-500/30 bg-yellow-500/10 text-yellow-500"
+            title="Browse real-world style deal opportunities."
+            copy="See how acquisition targets are presented in the wild — SMEs, SaaS, dental groups, fintech. Each card shows revenue, EBITDA, geography and the asking multiple, so you can practise sizing up deals before you ever step on a desk."
+          >
+            <MockDealMarketplace />
+          </FeatureSection>
+
+          <FeatureSection
+            reverse
+            icon={BookOpen}
+            eyebrow="M&A lessons"
+            accent="border-accent/30 bg-accent/10 text-accent"
+            title="Full corporate-finance curriculum."
+            copy="From 'what is a merger' to the four valuation pillars, accretion/dilution with worked numbers, and the full deal process (CIM → IOI → LOI → SPA → close). Written for students — clear, with the jargon explained inline."
+          >
+            <MockLessons />
+          </FeatureSection>
+
           <FeatureSection
             icon={Newspaper}
             eyebrow="Curated news"
@@ -549,10 +788,10 @@ export default function Landing({ onGetStarted }) {
           <div className="bg-gradient-to-br from-accent/10 via-purple-400/5 to-gain/10 border border-accent/20 rounded-3xl p-10 sm:p-14 backdrop-blur">
             <Zap size={36} className="text-accent mx-auto mb-4" />
             <h2 className="text-3xl sm:text-4xl font-bold leading-tight mb-3">
-              Ready to start trading?
+              Ready to learn finance — for real?
             </h2>
             <p className="text-base text-terminal-muted max-w-xl mx-auto mb-7">
-              Sign up in 30 seconds. Get $100,000 in virtual cash. Trade real markets without risking a cent.
+              Sign up in 30 seconds. Trade $100K of paper money on real markets, build an LBO model, and learn how M&amp;A deals actually work.
             </p>
             <button
               onClick={onGetStarted}

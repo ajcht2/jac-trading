@@ -4,7 +4,7 @@ import {
   BarChart3, ArrowLeftRight, Bot, BookOpen, RotateCcw, LogOut,
   Newspaper, Trophy, Plus, Pencil, Trash2, Check, X, ArrowLeft,
   ChevronDown, Layers, User as UserIcon, Wallet, TrendingUp, TrendingDown,
-  Sparkles, Briefcase,
+  Sparkles, Briefcase, PiggyBank, Calculator,
 } from 'lucide-react'
 import { usePortfolio } from '../context/PortfolioContext'
 import { usePrices } from '../context/PriceContext'
@@ -13,15 +13,36 @@ import { useBot } from '../context/BotContext'
 import { formatPrice } from '../services/api'
 import Logo from './Logo'
 
-const navItems = [
-  { to: '/',            icon: BarChart3,     label: 'Dashboard'  },
-  { to: '/trade',       icon: ArrowLeftRight,label: 'Paper Trade'},
-  { to: '/bot',         icon: Bot,           label: 'Bot'        },
-  { to: '/strategies',  icon: BookOpen,      label: 'Strategies' },
-  { to: '/m-and-a',     icon: Briefcase,     label: 'M&A'        },
-  { to: '/news',        icon: Newspaper,     label: 'News'       },
-  { to: '/leaderboard', icon: Trophy,        label: 'Leaderboard'},
+const navGroups = [
+  {
+    label: 'Trading',
+    color: '#3b82f6',
+    items: [
+      { to: '/',            icon: BarChart3,     label: 'Dashboard'  },
+      { to: '/trade',       icon: ArrowLeftRight,label: 'Paper Trade'},
+      { to: '/bot',         icon: Bot,           label: 'Bot'        },
+      { to: '/strategies',  icon: BookOpen,      label: 'Strategies' },
+    ],
+  },
+  {
+    label: 'M&A',
+    color: '#a855f7',
+    items: [
+      { to: '/m-and-a',     icon: Briefcase,     label: 'M&A Theory' },
+      { to: '/lbo',         icon: PiggyBank,     label: 'LBO Model'  },
+      { to: '/valuation',   icon: Calculator,    label: 'Valuation'  },
+    ],
+  },
+  {
+    label: 'Community',
+    color: '#10b981',
+    items: [
+      { to: '/news',        icon: Newspaper,     label: 'News'       },
+      { to: '/leaderboard', icon: Trophy,        label: 'Leaderboard'},
+    ],
+  },
 ]
+const navItems = navGroups.flatMap(g => g.items)
 
 function LiveValue({ value, prefix = '', className = '' }) {
   const [flash, setFlash] = useState('')
@@ -359,26 +380,34 @@ export default function Layout({ children }) {
           </div>
 
           <nav className="border-t border-terminal-border bg-terminal-panel/30">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-center gap-2 sm:gap-4 overflow-x-auto whitespace-nowrap py-1.5">
-              {navItems.map(({ to, icon: Icon, label }) => (
-                <NavLink
-                  key={to}
-                  to={to}
-                  end={to === '/'}
-                  className={({ isActive }) =>
-                    `flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all shrink-0 ${
-                      isActive
-                        ? 'bg-accent/10 text-accent border border-accent/20'
-                        : 'text-terminal-muted hover:text-terminal-text hover:bg-white/5 border border-transparent'
-                    }`
-                  }
-                >
-                  <Icon size={15} />
-                  <span className="hidden sm:inline">{label}</span>
-                  {to === '/bot' && botActive && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-gain animate-pulse" title="Bot running" />
-                  )}
-                </NavLink>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-center gap-3 sm:gap-5 overflow-x-auto whitespace-nowrap py-1.5">
+              {navGroups.map((group, gi) => (
+                <div key={group.label} className="flex items-center gap-1 sm:gap-2 shrink-0">
+                  {gi > 0 && <span className="h-5 w-px bg-terminal-border mx-1 sm:mx-2" />}
+                  <span className="hidden lg:inline text-[10px] uppercase tracking-wider font-semibold" style={{ color: group.color }}>
+                    {group.label}
+                  </span>
+                  {group.items.map(({ to, icon: Icon, label }) => (
+                    <NavLink
+                      key={to}
+                      to={to}
+                      end={to === '/'}
+                      className={({ isActive }) =>
+                        `flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all shrink-0 ${
+                          isActive
+                            ? 'bg-accent/10 text-accent border border-accent/20'
+                            : 'text-terminal-muted hover:text-terminal-text hover:bg-white/5 border border-transparent'
+                        }`
+                      }
+                    >
+                      <Icon size={14} />
+                      <span className="hidden md:inline">{label}</span>
+                      {to === '/bot' && botActive && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-gain animate-pulse" title="Bot running" />
+                      )}
+                    </NavLink>
+                  ))}
+                </div>
               ))}
             </div>
           </nav>

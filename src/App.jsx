@@ -10,6 +10,8 @@ import PaperTrading from './components/PaperTrading'
 import TradingBot from './components/TradingBot'
 import Strategies from './components/Strategies'
 import MergersAcquisitions from './components/MergersAcquisitions'
+import LboModel from './components/LboModel'
+import ValuationTool from './components/ValuationTool'
 import News from './components/News'
 import Leaderboard from './components/Leaderboard'
 
@@ -57,6 +59,8 @@ export default function App() {
           <Route path="/bot" element={<TradingBot />} />
           <Route path="/strategies" element={<Strategies />} />
           <Route path="/m-and-a" element={<MergersAcquisitions />} />
+          <Route path="/lbo" element={<LboModel />} />
+          <Route path="/valuation" element={<ValuationTool />} />
           <Route path="/news" element={<News />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="*" element={<Navigate to="/" replace />} />
