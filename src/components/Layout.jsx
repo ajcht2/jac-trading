@@ -4,7 +4,7 @@ import {
   BarChart3, ArrowLeftRight, Bot, BookOpen, RotateCcw, LogOut,
   Newspaper, Trophy, Plus, Pencil, Trash2, Check, X, ArrowLeft,
   ChevronDown, Layers, User as UserIcon, Wallet, TrendingUp, TrendingDown,
-  Sparkles,
+  Sparkles, Briefcase,
 } from 'lucide-react'
 import { usePortfolio } from '../context/PortfolioContext'
 import { usePrices } from '../context/PriceContext'
@@ -17,9 +17,10 @@ const navItems = [
   { to: '/',            icon: BarChart3,     label: 'Dashboard'  },
   { to: '/trade',       icon: ArrowLeftRight,label: 'Paper Trade'},
   { to: '/bot',         icon: Bot,           label: 'Bot'        },
+  { to: '/strategies',  icon: BookOpen,      label: 'Strategies' },
+  { to: '/m-and-a',     icon: Briefcase,     label: 'M&A'        },
   { to: '/news',        icon: Newspaper,     label: 'News'       },
   { to: '/leaderboard', icon: Trophy,        label: 'Leaderboard'},
-  { to: '/strategies',  icon: BookOpen,      label: 'Strategies' },
 ]
 
 function LiveValue({ value, prefix = '', className = '' }) {
