@@ -4,6 +4,7 @@ import { useAuth } from './context/AuthContext'
 import Layout from './components/Layout'
 import Login from './components/Login'
 import Landing from './components/Landing'
+import ErrorBoundary from './components/ErrorBoundary'
 import Onboarding from './components/Onboarding'
 import Dashboard from './components/Dashboard'
 import PaperTrading from './components/PaperTrading'
@@ -45,29 +46,35 @@ export default function App() {
   }
 
   if (!user) {
-    return showLogin
-      ? <Login onBack={() => setShowLogin(false)} />
-      : <Landing onGetStarted={() => setShowLogin(true)} />
+    return (
+      <ErrorBoundary>
+        {showLogin
+          ? <Login onBack={() => setShowLogin(false)} />
+          : <Landing onGetStarted={() => setShowLogin(true)} />}
+      </ErrorBoundary>
+    )
   }
 
   return (
-    <>
+    <ErrorBoundary>
       {showOnboarding && <Onboarding onComplete={completeOnboarding} />}
       <Layout>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/trade" element={<PaperTrading />} />
-          <Route path="/bot" element={<TradingBot />} />
-          <Route path="/strategies" element={<Strategies />} />
-          <Route path="/m-and-a" element={<MergersAcquisitions />} />
-          <Route path="/lbo" element={<LboModel />} />
-          <Route path="/valuation" element={<ValuationTool />} />
-          <Route path="/courses" element={<Courses />} />
-          <Route path="/news" element={<News />} />
-        <Route path="/leaderboard" element={<Leaderboard />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/trade" element={<PaperTrading />} />
+            <Route path="/bot" element={<TradingBot />} />
+            <Route path="/strategies" element={<Strategies />} />
+            <Route path="/m-and-a" element={<MergersAcquisitions />} />
+            <Route path="/lbo" element={<LboModel />} />
+            <Route path="/valuation" element={<ValuationTool />} />
+            <Route path="/courses" element={<Courses />} />
+            <Route path="/news" element={<News />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </ErrorBoundary>
       </Layout>
-    </>
+    </ErrorBoundary>
   )
 }
