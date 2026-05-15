@@ -32,6 +32,7 @@ const TRADING_TRACK = {
           number: '1.1',
           title: 'What is a financial market?',
           duration: '8 min',
+          video: { id: 'WQui_3Hpmmc', title: 'Financial Markets — Lecture 1: Introduction', channel: 'Yale Open Courses · Robert Shiller' },
           objectives: [
             'Define a financial market and its economic function',
             'Identify the main participants on each side of a trade',
@@ -57,6 +58,7 @@ const TRADING_TRACK = {
           number: '1.2',
           title: 'The major asset classes',
           duration: '10 min',
+          video: { id: 'ZwnzE3uH6R4', title: 'Asset Classes Explained — Equities, Bonds, Commodities, FX, Real Estate', channel: 'Quant Tutorials' },
           objectives: [
             'Distinguish equities, bonds, FX, commodities, derivatives, and crypto',
             'Match each asset class to its primary risk and return profile',
@@ -83,6 +85,7 @@ const TRADING_TRACK = {
           number: '1.3',
           title: 'Primary vs secondary markets',
           duration: '7 min',
+          video: { id: 'Xc-NKE65yv0', title: 'What is Primary & Secondary Market? Easy Explanation', channel: 'Pocketful' },
           objectives: [
             'Understand how securities first come into existence (primary)',
             'See how they then change hands among investors (secondary)',
@@ -105,6 +108,7 @@ const TRADING_TRACK = {
           number: '1.4',
           title: 'Market structure: exchanges, market makers, dark pools',
           duration: '9 min',
+          video: { id: 'DX9djYus9tY', title: 'Rigged — High-Frequency Trading Exposed (Michael Lewis on 60 Minutes)', channel: '60 Minutes' },
           objectives: [
             'Understand how an order is matched on a modern exchange',
             'Know the role of a market maker and a high-frequency trader',
@@ -138,6 +142,7 @@ const TRADING_TRACK = {
           number: '2.1',
           title: 'How stocks are priced: three forces',
           duration: '8 min',
+          video: { id: 'eQdtRljmoBY', title: 'Mr Market: Intrinsic Value vs Stock Price', channel: 'Fundamental Stock Analysis' },
           objectives: [
             'Articulate the three forces that move stock prices',
             'Distinguish intrinsic value from market price',
@@ -161,6 +166,7 @@ const TRADING_TRACK = {
           number: '2.2',
           title: 'Reading financial statements',
           duration: '12 min',
+          video: { id: 'Rmi9fwkJjHw', title: 'Build a 3-Statement Financial Model — Free Course', channel: 'Wall Street Prep' },
           objectives: [
             'Identify the three core statements: Income Statement, Balance Sheet, Cash Flow',
             'Understand how the three connect',
@@ -185,6 +191,7 @@ const TRADING_TRACK = {
           number: '2.3',
           title: 'Key valuation ratios',
           duration: '10 min',
+          video: { id: 'YGn5QPkfFh4', title: 'P/E, P/B Ratio & More — Financial Ratios for Easy Analysis', channel: 'Stock Market A to Z' },
           objectives: [
             'Use P/E, P/B, P/S, dividend yield to size up a stock',
             'Understand when each ratio is useful (and when it lies)',
@@ -207,6 +214,7 @@ const TRADING_TRACK = {
           number: '2.4',
           title: 'Value vs Growth investing',
           duration: '9 min',
+          video: { id: 'QmQZYy3ef8I', title: 'Warren Buffett — Investing In Value Vs Growth Stocks', channel: 'Investor Archive' },
           objectives: [
             'Distinguish the value and growth philosophies',
             'Know the famous practitioners on both sides',
@@ -237,6 +245,7 @@ const TRADING_TRACK = {
           number: '3.1',
           title: 'Candlestick charts and timeframes',
           duration: '7 min',
+          video: { id: 'IGcq8FiIpOk', title: 'Candlestick Charts — Complete Beginner\'s Guide', channel: 'Trade Pro' },
           objectives: [
             'Read a candlestick: open, high, low, close',
             'Pick the right timeframe for your strategy',
@@ -261,6 +270,7 @@ const TRADING_TRACK = {
           number: '3.2',
           title: 'Moving averages and trend',
           duration: '8 min',
+          video: { id: 'ZtAA0hGKmiQ', title: 'Golden Cross vs Death Cross — Complete Guide', channel: 'The Trading Channel' },
           objectives: [
             'Compute SMA and EMA',
             'Use moving averages to define trend',
@@ -285,6 +295,7 @@ const TRADING_TRACK = {
           number: '3.3',
           title: 'Oscillators: RSI, MACD, Stochastic',
           duration: '10 min',
+          video: { id: 'xQYrUSRrLYo', title: 'MACD Indicator Trading Explained (For Beginners)', channel: 'Rayner Teo' },
           objectives: [
             'Understand what an oscillator measures',
             'Read RSI, MACD, and Stochastic correctly',
@@ -307,6 +318,7 @@ const TRADING_TRACK = {
           number: '3.4',
           title: 'Support, resistance, and chart patterns',
           duration: '9 min',
+          video: { id: 'xzUCED09Z_A', title: 'How to Use Support and Resistance to Read Stock Charts', channel: 'The Trading Channel' },
           objectives: [
             'Identify horizontal support and resistance',
             'Recognize the most reliable chart patterns',
@@ -337,6 +349,7 @@ const TRADING_TRACK = {
           number: '4.1',
           title: 'What is algorithmic trading?',
           duration: '7 min',
+          video: { id: 'xfzGZB4HhEE', title: 'Algorithmic Trading Using Python — Full Course', channel: 'freeCodeCamp' },
           objectives: [
             'Define algorithmic / systematic / quantitative trading',
             'Understand the spectrum from rule-based to ML-driven',
@@ -361,6 +374,7 @@ const TRADING_TRACK = {
           number: '4.2',
           title: 'Backtesting: the foundation and the trap',
           duration: '11 min',
+          video: { id: 'sjq3toGtr0U', title: '3 Backtesting Pitfalls That Ruin Your Trading Strategy', channel: 'Algovibes' },
           objectives: [
             'Set up a clean backtest',
             'Avoid the three biggest pitfalls: lookahead bias, overfitting, survivorship bias',
@@ -385,6 +399,7 @@ const TRADING_TRACK = {
           number: '4.3',
           title: 'Risk management: position sizing & drawdowns',
           duration: '10 min',
+          video: { id: 'THYLv5_0Vm8', title: 'Kelly Criterion — Ed Thorp — Optimal Position Sizing', channel: 'Coin Bureau / Patrick Boyle clips' },
           objectives: [
             'Size positions based on volatility, not gut feel',
             'Use stop-losses and understand their tradeoffs',
@@ -410,6 +425,7 @@ const TRADING_TRACK = {
           number: '4.4',
           title: 'The momentum anomaly',
           duration: '8 min',
+          video: { id: 'rrh7ti8_Uw8', title: 'Introduction to Momentum — Trading Lesson', channel: 'Interactive Brokers' },
           objectives: [
             'Understand why momentum exists despite efficient market theory',
             'Apply the classic 12-1 momentum rule',
@@ -450,6 +466,7 @@ const MNA_TRACK = {
           number: '1.1',
           title: 'What does a company do with money?',
           duration: '6 min',
+          video: { id: 'xGVZJhvQLcE', title: 'Lessons from the World\'s Greatest Capital Allocators — The Outsiders', channel: 'The Investor\'s Podcast' },
           objectives: [
             'Map the four main uses of corporate cash',
             'Understand the trade-off between growth and shareholder returns',
@@ -474,6 +491,7 @@ const MNA_TRACK = {
           number: '1.2',
           title: 'The three financial statements (deep dive)',
           duration: '12 min',
+          video: { id: 'Rmi9fwkJjHw', title: 'Build a 3-Statement Financial Model — Free Course', channel: 'Wall Street Prep' },
           objectives: [
             'Build the link between Income Statement, Balance Sheet, Cash Flow',
             'Identify the key line items used in modeling',
@@ -498,6 +516,7 @@ const MNA_TRACK = {
           number: '1.3',
           title: 'Free Cash Flow: FCFF vs FCFE',
           duration: '10 min',
+          video: { id: 'rtIvIy6Fl0A', title: 'CFA Level 2 — Calculating FCFF and FCFE from Financial Statements', channel: 'AnalystPrep' },
           objectives: [
             'Compute Free Cash Flow to the Firm (FCFF)',
             'Compute Free Cash Flow to Equity (FCFE)',
@@ -521,6 +540,7 @@ const MNA_TRACK = {
           number: '1.4',
           title: 'WACC — the cost of capital',
           duration: '11 min',
+          video: { id: 'XEQOCjXmt9E', title: 'A Beginner\'s Guide to the Weighted Average Cost of Capital (WACC)', channel: 'Career Principles' },
           objectives: [
             'Compute WACC from scratch',
             'Use CAPM to estimate cost of equity',
@@ -553,6 +573,7 @@ const MNA_TRACK = {
           number: '2.1',
           title: 'Enterprise Value vs Equity Value (the bridge)',
           duration: '8 min',
+          video: { id: 'o2NsB8aNpGQ', title: 'Equity Value vs Enterprise Value: The Ultimate Bridge Explained', channel: 'Financial Modeling' },
           objectives: [
             'Distinguish EV from Equity Value',
             'Walk the EV → Equity bridge',
@@ -577,6 +598,7 @@ const MNA_TRACK = {
           number: '2.2',
           title: 'DCF — the full mechanics',
           duration: '15 min',
+          video: { id: 'nyot7FkYoqM', title: 'How to Build a Discounted Cash Flow (DCF) — Ex-JP Morgan Banker', channel: 'Kenji Explains' },
           objectives: [
             'Project unlevered free cash flow for 5-10 years',
             'Calculate terminal value with Gordon Growth and exit multiple',
@@ -605,6 +627,7 @@ const MNA_TRACK = {
           number: '2.3',
           title: 'Trading Comparables',
           duration: '10 min',
+          video: { id: 'XbDc6T-oO_c', title: 'Trading Comps Valuation Tutorial — Former JP Morgan Banker', channel: 'Kenji Explains' },
           objectives: [
             'Build a peer group correctly',
             'Calculate and present multiples',
@@ -627,6 +650,7 @@ const MNA_TRACK = {
           number: '2.4',
           title: 'Precedent Transactions',
           duration: '9 min',
+          video: { id: 'ZH8Vw-j2Db4', title: 'Precedent Transaction Analysis — Full Guide and Excel Examples', channel: 'Mergers & Inquisitions' },
           objectives: [
             'Find comparable past M&A deals',
             'Adjust multiples for time and market conditions',
@@ -657,6 +681,7 @@ const MNA_TRACK = {
           number: '3.1',
           title: 'Strategic vs financial buyers',
           duration: '8 min',
+          video: { id: 'PWpCMtTymnE', title: 'Private Equity vs Strategic Buyers — Who Pays More for Your Business?', channel: 'M&A Talk' },
           objectives: [
             'Distinguish strategic and financial buyers and their motivations',
             'Understand why each one values the same target differently',
@@ -679,6 +704,7 @@ const MNA_TRACK = {
           number: '3.2',
           title: 'Deal structures: stock vs asset, cash vs stock',
           duration: '10 min',
+          video: { id: 'h-RS_8axm3o', title: 'Innovation in Deal Structures and Forms of Consideration', channel: 'M&A Advisors' },
           objectives: [
             'Distinguish stock and asset purchases',
             'Understand the tax and legal implications of each',
@@ -703,6 +729,7 @@ const MNA_TRACK = {
           number: '3.3',
           title: 'The deal process: 9-month timeline',
           duration: '12 min',
+          video: { id: 'igDXJuTVdyI', title: 'A Week in the Life of an Investment Banking Analyst — Live M&A Deal', channel: 'rareliquid' },
           objectives: [
             'Walk through every phase of an M&A deal',
             'Know what an analyst does at each stage',
@@ -730,6 +757,7 @@ const MNA_TRACK = {
           number: '3.4',
           title: 'Synergies and how they\'re modeled',
           duration: '9 min',
+          video: { id: 'b8vQ6_Urs1U', title: 'Understanding Synergies in M&A: Cost, Revenue & Beyond Explained', channel: 'Fifth Chrome' },
           objectives: [
             'Distinguish cost / revenue / financial / operational synergies',
             'Value synergies via DCF',
@@ -762,6 +790,7 @@ const MNA_TRACK = {
           number: '4.1',
           title: 'What is Private Equity?',
           duration: '8 min',
+          video: { id: '70DLbhn8JcY', title: 'How Private Equity Works: Blackstone, KKR, Apollo, Carlyle Explained!', channel: 'Wall Street Millennial' },
           objectives: [
             'Understand the PE business model (fees + carry)',
             'Distinguish LBOs, growth equity, and venture capital',
@@ -785,6 +814,7 @@ const MNA_TRACK = {
           number: '4.2',
           title: 'The Sources & Uses table',
           duration: '8 min',
+          video: { id: 'zeCfu5g0Uis', title: 'How to Build a Leveraged Buyout (LBO) Model in 5 Steps', channel: 'Kenji Explains' },
           objectives: [
             'Build a Sources & Uses table',
             'Understand each piece of typical LBO capital structure',
@@ -808,6 +838,7 @@ const MNA_TRACK = {
           number: '4.3',
           title: 'LBO model: full mechanics',
           duration: '15 min',
+          video: { id: 'F7F6V4W4Gac', title: 'Leveraged Buyout (LBO) Model Tutorial', channel: 'Wall Street Prep' },
           objectives: [
             'Project a 5-year LBO from entry to exit',
             'Model debt schedule and cash sweep',
@@ -833,6 +864,7 @@ const MNA_TRACK = {
           number: '4.4',
           title: 'Value-creation bridge: where do returns come from?',
           duration: '10 min',
+          video: { id: '0vdGHM99li8', title: 'LBO Returns Analysis: Measuring IRR and MOIC', channel: 'Wall Street Prep' },
           objectives: [
             'Decompose LBO equity returns into three drivers',
             'Understand the difference between "good" and "lucky" LBOs',
