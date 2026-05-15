@@ -69,7 +69,7 @@ export default function Login({ onBack }) {
         {/* Logo */}
         <div className="text-center">
           <Logo size="lg" />
-          <p className="text-terminal-muted mt-4 text-sm">Paper Trading Dashboard & Championship</p>
+          <p className="text-terminal-muted mt-4 text-sm">Corporate finance & M&A — for finance students</p>
         </div>
 
         {/* Features */}
@@ -155,7 +155,7 @@ export default function Login({ onBack }) {
                   {mode === 'signup' ? 'Create Account' : 'Welcome Back'}
                 </h2>
                 <p className="text-sm text-terminal-muted mt-1">
-                  {mode === 'signup' ? 'Start trading with $100,000 virtual cash' : 'Sign in to your trading account'}
+                  {mode === 'signup' ? 'Build your first DCF, LBO and football-field valuation' : 'Sign in to continue your curriculum'}
                 </p>
               </div>
 

@@ -15,16 +15,6 @@ import { formatPrice } from '../services/api'
 
 const navGroups = [
   {
-    label: 'Trading',
-    color: '#3b82f6',
-    items: [
-      { to: '/',            icon: BarChart3,     label: 'Dashboard'  },
-      { to: '/trade',       icon: ArrowLeftRight,label: 'Paper Trade'},
-      { to: '/bot',         icon: Bot,           label: 'Bot'        },
-      { to: '/strategies',  icon: BookOpen,      label: 'Strategies' },
-    ],
-  },
-  {
     label: 'M&A',
     color: '#a855f7',
     items: [
@@ -41,11 +31,22 @@ const navGroups = [
     ],
   },
   {
-    label: 'Community',
+    label: 'News',
     color: '#10b981',
     items: [
       { to: '/news',        icon: Newspaper,     label: 'News'       },
-      { to: '/leaderboard', icon: Trophy,        label: 'Leaderboard'},
+    ],
+  },
+  // Engineering side project — separated visually from the finance content
+  {
+    label: 'Sandbox',
+    color: '#64748b',
+    items: [
+      { to: '/markets',     icon: BarChart3,     label: 'Markets'      },
+      { to: '/trade',       icon: ArrowLeftRight,label: 'Sim Trade'    },
+      { to: '/bot',         icon: Bot,           label: 'Bot'          },
+      { to: '/strategies',  icon: BookOpen,      label: 'Strategies'   },
+      { to: '/leaderboard', icon: Trophy,        label: 'Sim Ranking'  },
     ],
   },
 ]
@@ -447,9 +448,9 @@ function LivePanel({ cash, positionsValue, totalEquity, totalPnl, totalPnlPct, h
 // ──────────────────────────────────────────────────────────
 // Main layout.
 // ──────────────────────────────────────────────────────────
-// Routes where the live portfolio panel makes sense (the Trading group).
-// Everywhere else (M&A, Courses, News, Leaderboard) it's hidden.
-const TRADING_ROUTES = ['/', '/trade', '/bot', '/strategies']
+// Routes where the live portfolio panel makes sense (the sandbox simulator).
+// Hidden on every M&A / Courses / News page so they read as serious content.
+const TRADING_ROUTES = ['/markets', '/trade', '/bot', '/strategies']
 
 export default function Layout({ children }) {
   const { state, dispatch, slots, activeSlot } = usePortfolio()
@@ -457,7 +458,8 @@ export default function Layout({ children }) {
   const { botActive, botConfig } = useBot()
   const navigate = useNavigate()
   const location = useLocation()
-  const canGoBack = location.pathname !== '/'
+  // `/` and `/m-and-a` both render the M&A page — both are "home"
+  const canGoBack = location.pathname !== '/' && location.pathname !== '/m-and-a'
   const activeSlotName = slots[activeSlot]?.name || 'Portfolio'
   const showLivePanel = TRADING_ROUTES.includes(location.pathname)
 

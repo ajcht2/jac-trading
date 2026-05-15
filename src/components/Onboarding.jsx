@@ -1,42 +1,36 @@
 import { useState } from 'react'
-import { ArrowRight, Trophy, BarChart3, Bot, Wallet, Newspaper, Target, Clock, ChevronRight } from 'lucide-react'
+import { ArrowRight, Briefcase, Calculator, PiggyBank, GraduationCap, BarChart3, BookOpen, ChevronRight } from 'lucide-react'
 
 const STEPS = [
   {
-    icon: Trophy,
-    color: '#f59e0b',
-    title: 'Welcome to the JAC Trading Championship!',
-    description: 'You start with $100,000 in virtual cash. Your goal? Build the most profitable portfolio by the end of the competition.',
-  },
-  {
-    icon: BarChart3,
+    icon: Briefcase,
     color: '#3b82f6',
-    title: 'Track the Markets',
-    description: 'Use the Dashboard to search any stock or crypto, view live charts with candlestick data, and monitor prices updated every 5 seconds.',
+    title: 'Welcome to JAC',
+    description: 'An interactive corporate finance and M&A curriculum for students aiming at investment banking, leveraged finance, or equity research. Built around real modeling work and a structured set of lessons.',
   },
   {
-    icon: Wallet,
-    color: '#22c55e',
-    title: 'Trade Like a Pro',
-    description: 'Go to Paper Trade to buy and sell stocks with your virtual cash. You can also quick-trade directly from any chart. Every trade is tracked in your history.',
-  },
-  {
-    icon: Bot,
+    icon: BookOpen,
     color: '#a855f7',
-    title: 'Deploy a Trading Bot',
-    description: 'Let an algorithm trade for you! Choose from 4 strategies (SMA Crossover, RSI, MACD, Momentum), pick a stock, and let the bot monitor the market every 30 seconds.',
+    title: 'The M&A curriculum',
+    description: 'Eight courses, thirty-two numbered lessons — from corporate finance foundations and the three statements to LBO mechanics and accretion/dilution. Each lesson has learning objectives, worked examples, and citations to real sources.',
   },
   {
-    icon: Newspaper,
+    icon: Calculator,
+    color: '#22c55e',
+    title: 'The Valuation Tool',
+    description: 'Pick a sector, enter LTM revenue and EBITDA, and get an instant football-field range across EV/Revenue, EV/EBITDA and a quick DCF. The exact output bankers present on a pitch.',
+  },
+  {
+    icon: PiggyBank,
     color: '#ef4444',
-    title: 'Stay Informed',
-    description: 'Check the News page for the latest financial headlines from around the world. Knowledge is your edge — the best traders are the most informed.',
+    title: 'The LBO Model',
+    description: 'Build a real leveraged buyout step by step — sources & uses, debt paydown schedule, year-by-year EBITDA, exit equity, IRR, MOIC, and the value-creation bridge (multiple expansion / EBITDA growth / deleveraging).',
   },
   {
-    icon: Target,
-    color: '#f97316',
-    title: 'Rules of the Game',
-    description: 'Everyone starts with $100,000. Trade stocks, ETFs, and crypto. Use manual trading, bots, or both. The player with the highest total equity at the end wins!',
+    icon: GraduationCap,
+    color: '#f59e0b',
+    title: 'Markets simulator (side project)',
+    description: 'There is also a markets simulator built as an engineering exercise: live charts, three paper-trading sandboxes, four backtested signals. Not the focus of the site — kept for those interested in the engineering side.',
   },
 ]
 
@@ -94,7 +88,7 @@ export default function Onboarding({ onComplete }) {
               className="flex-1 py-3 rounded-xl bg-accent hover:bg-accent/90 text-white font-semibold text-sm transition-all flex items-center justify-center gap-2"
             >
               {isLast ? (
-                <>Start Trading <ArrowRight size={16} /></>
+                <>Start learning <ArrowRight size={16} /></>
               ) : (
                 <>Next <ChevronRight size={16} /></>
               )}

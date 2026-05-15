@@ -61,15 +61,18 @@ export default function App() {
       <Layout>
         <ErrorBoundary>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/trade" element={<PaperTrading />} />
-            <Route path="/bot" element={<TradingBot />} />
-            <Route path="/strategies" element={<Strategies />} />
+            {/* Home now lands on M&A — positioning is IB / corporate finance */}
+            <Route path="/" element={<MergersAcquisitions />} />
             <Route path="/m-and-a" element={<MergersAcquisitions />} />
             <Route path="/lbo" element={<LboModel />} />
             <Route path="/valuation" element={<ValuationTool />} />
             <Route path="/courses" element={<Courses />} />
             <Route path="/news" element={<News />} />
+            {/* Engineering side-project — markets simulator */}
+            <Route path="/markets" element={<Dashboard />} />
+            <Route path="/trade" element={<PaperTrading />} />
+            <Route path="/bot" element={<TradingBot />} />
+            <Route path="/strategies" element={<Strategies />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

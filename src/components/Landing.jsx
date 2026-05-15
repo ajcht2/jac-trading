@@ -672,19 +672,19 @@ export default function Landing({ onGetStarted }) {
           </button>
         </nav>
 
-        {/* Hero */}
+        {/* Hero — IB / Corporate Finance positioning */}
         <section className="px-6 pt-12 pb-16 max-w-5xl mx-auto text-center space-y-7">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/30 text-[11px] font-semibold uppercase tracking-wider text-accent">
-            <Sparkles size={12} /> Free · No credit card · Built for finance students
+            <Briefcase size={12} /> Investment banking · Corporate finance · For students
           </div>
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05]">
-            The trading floor<br />
+            Master valuation,<br />
             <span className="bg-gradient-to-r from-accent via-purple-400 to-gain bg-clip-text text-transparent">
-              and the deal room.
+              from comps to LBO.
             </span>
           </h1>
           <p className="text-lg sm:text-xl text-terminal-muted max-w-2xl mx-auto leading-relaxed">
-            Learn markets <em>and</em> investment banking in one place. $100K paper-trading account on one side, interactive LBO models, valuation tools and deal-process lessons on the other. Built for students aiming at S&amp;T or M&amp;A careers.
+            An interactive corporate finance and M&amp;A curriculum for students targeting investment banking. Build a DCF, an LBO model and a football-field valuation — the way a junior analyst would on a live deal.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
             <button
@@ -701,83 +701,23 @@ export default function Landing({ onGetStarted }) {
             </a>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 max-w-3xl mx-auto">
-            <div><p className="text-2xl font-mono font-bold">$100K</p><p className="text-xs text-terminal-muted">Paper cash</p></div>
-            <div><p className="text-2xl font-mono font-bold">4</p><p className="text-xs text-terminal-muted">Algo strategies</p></div>
-            <div><p className="text-2xl font-mono font-bold">2</p><p className="text-xs text-terminal-muted">M&amp;A tools</p></div>
+            <div><p className="text-2xl font-mono font-bold">8</p><p className="text-xs text-terminal-muted">Courses</p></div>
             <div><p className="text-2xl font-mono font-bold">32</p><p className="text-xs text-terminal-muted">Lessons</p></div>
+            <div><p className="text-2xl font-mono font-bold">2</p><p className="text-xs text-terminal-muted">Modeling tools</p></div>
+            <div><p className="text-2xl font-mono font-bold">6</p><p className="text-xs text-terminal-muted">Valuation methods</p></div>
           </div>
         </section>
 
         <LiveTicker />
 
-        {/* Features */}
+        {/* Features — IB / Corporate Finance first */}
         <section id="features" className="px-6 py-20 max-w-6xl mx-auto space-y-24">
-          <FeatureSection
-            icon={Activity}
-            eyebrow="Live market data"
-            accent="border-accent/30 bg-accent/10 text-accent"
-            title="Pro-grade charts. Updated every few seconds."
-            copy="Real-time stock and crypto prices via Yahoo Finance. Candlestick charts with OHLCV tooltips, multiple timeframes, 52-week range, and a crypto watchlist that ticks live."
-          >
-            <MockChart />
-          </FeatureSection>
-
-          <FeatureSection
-            reverse
-            icon={Layers}
-            eyebrow="Up to 3 portfolios"
-            accent="border-purple-400/30 bg-purple-400/10 text-purple-400"
-            title="Run three strategies at once."
-            copy="Keep a tech portfolio, a crypto portfolio, and a defensive one — side by side. Each gets its own $100K, its own positions, its own P&L. Switch instantly."
-          >
-            <MockPortfolioSwitcher />
-          </FeatureSection>
-
-          <FeatureSection
-            icon={Brain}
-            eyebrow="Algorithmic bots"
-            accent="border-purple-400/30 bg-purple-400/10 text-purple-400"
-            title="Deploy bots. Backtest in seconds."
-            copy="Four battle-tested strategies (SMA Crossover, RSI Mean Reversion, MACD, Momentum) with full 1-year backtests, win rate, alpha vs buy-and-hold, and one-click deployment to your portfolio."
-          >
-            <MockBot />
-          </FeatureSection>
-
-          <FeatureSection
-            reverse
-            icon={Trophy}
-            eyebrow="Live leaderboard"
-            accent="border-yellow-500/30 bg-yellow-500/10 text-yellow-500"
-            title="Compete. Climb. Inspect every trade."
-            copy="See exactly how your friends are beating the market. Click anyone to view their open positions and full trade history. Your rank updates in real time as prices move."
-          >
-            <MockLeaderboard />
-          </FeatureSection>
-
-          {/* ────────── M&A SIDE ────────── */}
-          <div className="pt-12">
-            <div className="max-w-3xl mx-auto text-center space-y-3 mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-400/10 border border-purple-400/30 text-[11px] font-semibold uppercase tracking-wider text-purple-400">
-                <Briefcase size={12} /> The deal-room side
-              </div>
-              <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-[1.1]">
-                Investment banking,<br />
-                <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-accent bg-clip-text text-transparent">
-                  built for finance majors.
-                </span>
-              </h2>
-              <p className="text-base text-terminal-muted leading-relaxed">
-                The same site that lets you trade also teaches you M&amp;A. Interactive LBO and valuation tools, full deal-process lessons, and worked examples — everything you'd cover in a corporate finance course or a banking interview.
-              </p>
-            </div>
-          </div>
-
           <FeatureSection
             icon={PiggyBank}
             eyebrow="LBO model"
             accent="border-red-500/30 bg-red-500/10 text-red-400"
             title="Build a real leveraged buyout, slide by slide."
-            copy="Drag the equity contribution, EBITDA growth and exit multiple. The model recalculates sponsor IRR and MOIC in real time, with a value-creation bridge that breaks down how much return came from leverage, growth, and multiple expansion."
+            copy="Adjust equity contribution, debt rate, EBITDA growth and exit multiple. The model recalculates sponsor IRR and MOIC live, with a value-creation bridge decomposing returns into multiple expansion, EBITDA growth and debt paydown — the way every sponsor presents an exit to its LPs."
           >
             <MockLBO />
           </FeatureSection>
@@ -787,18 +727,18 @@ export default function Landing({ onGetStarted }) {
             icon={Calculator}
             eyebrow="Valuation tool"
             accent="border-purple-400/30 bg-purple-400/10 text-purple-400"
-            title="Valuation, three methods, one football field."
-            copy="Punch in revenue and EBITDA, pick an industry. Get an instant range from trading comps (EV/Revenue, EV/EBITDA) and a quick DCF — exactly the way bankers present a target's valuation on a pitch."
+            title="EV/EBITDA, EV/Revenue, DCF — one football field."
+            copy="Pick a sector, plug in revenue and EBITDA, get an instant valuation range from trading comps and a simple DCF. The same output bankers put on the football-field slide of a pitch."
           >
             <MockValuation />
           </FeatureSection>
 
           <FeatureSection
             icon={Building2}
-            eyebrow="Deal marketplace"
+            eyebrow="Deal write-ups"
             accent="border-yellow-500/30 bg-yellow-500/10 text-yellow-500"
-            title="Browse real-world style deal opportunities."
-            copy="See how acquisition targets are presented in the wild — SMEs, SaaS, dental groups, fintech. Each card shows revenue, EBITDA, geography and the asking multiple, so you can practise sizing up deals before you ever step on a desk."
+            title="Read M&A deals like an analyst would."
+            copy="Curated acquisition targets and recently-announced deals presented the way they appear in CIMs and pitch decks — revenue, EBITDA, geography, asking multiple. The format you'll model against on a first-year desk."
           >
             <MockDealMarketplace />
           </FeatureSection>
@@ -806,10 +746,10 @@ export default function Landing({ onGetStarted }) {
           <FeatureSection
             reverse
             icon={BookOpen}
-            eyebrow="M&A lessons"
+            eyebrow="M&A curriculum"
             accent="border-accent/30 bg-accent/10 text-accent"
-            title="Full corporate-finance curriculum."
-            copy="From 'what is a merger' to the four valuation pillars, accretion/dilution with worked numbers, and the full deal process (CIM → IOI → LOI → SPA → close). Written for students — clear, with the jargon explained inline."
+            title="From accretion/dilution to LBO mechanics."
+            copy="The four valuation pillars (DCF, trading comps, precedents, LBO), the full M&amp;A process (CIM → IOI → LOI → SPA → closing), synergies, deal structuring, and accretion/dilution with worked numbers. Written for students who want to walk into a banking interview prepared."
           >
             <MockLessons />
           </FeatureSection>
@@ -818,26 +758,89 @@ export default function Landing({ onGetStarted }) {
             icon={GraduationCap}
             eyebrow="Full curriculum"
             accent="border-yellow-500/30 bg-yellow-500/10 text-yellow-500"
-            title="8 courses, 32 lessons — like a finance degree, free."
-            copy="A structured curriculum across two tracks: Trading & Markets (asset classes → equity analysis → technical → algo trading) and M&A & Investment Banking (corporate finance → valuation → process → LBO/PE). Each lesson has learning objectives, worked examples, and citations to NYU Stern lectures, CFA readings, Wall Street Prep, and the best YouTube channels."
+            title="8 courses, 32 lessons, real sources."
+            copy="A structured corporate-finance and M&amp;A curriculum with learning objectives, formulas and worked examples on every lesson. Citations to NYU Stern (Damodaran), Wharton, Yale Open Courses, CFA readings, Wall Street Prep and Macabacus."
           >
             <MockCourses />
           </FeatureSection>
 
+          {/* ─────────────────────────────────────────────────────
+              Side project — engineering / markets simulator.
+              The trading features below were built as an engineering
+              side project and are kept here for completeness. They
+              are NOT the focus of this site.
+              ───────────────────────────────────────────────────── */}
+          <div className="pt-12">
+            <div className="max-w-3xl mx-auto text-center space-y-3 mb-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-terminal-border text-[11px] font-semibold uppercase tracking-wider text-terminal-muted">
+                <Activity size={12} /> Side project · Engineering
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-terminal-text/80">
+                Markets simulator
+              </h2>
+              <p className="text-sm text-terminal-muted leading-relaxed max-w-xl mx-auto">
+                A simulator I built as an engineering project to learn full-stack development — real-time market data, a paper-trading sandbox and four backtested signal strategies. Useful for prototyping but not the centre of this site.
+              </p>
+            </div>
+          </div>
+
+          <FeatureSection
+            reverse
+            icon={Activity}
+            eyebrow="Live market data"
+            accent="border-terminal-border bg-white/[0.03] text-terminal-muted"
+            title="Real-time charts via Yahoo Finance."
+            copy="Pro-grade candlestick charts with OHLCV tooltips, multiple timeframes, 52-week range, and an equity / crypto watchlist that updates every few seconds. The engineering work behind it was the main learning objective."
+          >
+            <MockChart />
+          </FeatureSection>
+
+          <FeatureSection
+            icon={Layers}
+            eyebrow="Multi-account sandbox"
+            accent="border-terminal-border bg-white/[0.03] text-terminal-muted"
+            title="Three independent simulated accounts."
+            copy="Three independent sandboxes, each with its own positions and P&amp;L. Strictly virtual — no money involved, no broker connectivity. Useful for testing portfolio construction logic."
+          >
+            <MockPortfolioSwitcher />
+          </FeatureSection>
+
+          <FeatureSection
+            reverse
+            icon={Brain}
+            eyebrow="Signal backtests"
+            accent="border-terminal-border bg-white/[0.03] text-terminal-muted"
+            title="Four signals, one-year backtests."
+            copy="Four well-known technical signals (SMA crossover, RSI, MACD, momentum) with 1-year backtests, win rate and alpha vs buy-and-hold. The implementation is the interesting part — clean event loop, no lookahead bias."
+          >
+            <MockBot />
+          </FeatureSection>
+
+          <FeatureSection
+            icon={Trophy}
+            eyebrow="Sandbox rankings"
+            accent="border-terminal-border bg-white/[0.03] text-terminal-muted"
+            title="Live ranking across simulated accounts."
+            copy="A leaderboard across all simulator users. Strictly for fun within the engineering sandbox — not a competitive trading product."
+          >
+            <MockLeaderboard />
+          </FeatureSection>
+
+          {/* News kept at the bottom — neutral content */}
           <FeatureSection
             reverse
             icon={Newspaper}
             eyebrow="Curated news"
             accent="border-gain/30 bg-gain/10 text-gain"
-            title="Market news that actually matters."
-            copy="A curated feed of the headlines moving the markets right now — earnings, macro, crypto, big-tech. Click through to the source."
+            title="Headlines that move the markets."
+            copy="Earnings, macro, deal announcements, sector moves — curated and tagged. Useful for keeping a running view on what's actually driving the comp set you're modeling."
           >
             <div className="space-y-2">
               {[
-                { tag: 'EARNINGS', title: 'NVIDIA reports record Q4 — beats estimates by 18%', time: '2h' },
-                { tag: 'MACRO',    title: 'Fed signals two rate cuts in 2026 amid cooling inflation', time: '4h' },
-                { tag: 'CRYPTO',   title: 'Bitcoin breaches $96K as ETF inflows hit new record', time: '6h' },
-                { tag: 'TECH',     title: 'Apple unveils new AI chip — supply chain ramps up', time: '8h' },
+                { tag: 'M&A',      title: 'IBM agrees to acquire HashiCorp for $6.4B — multiple at 17× EBITDA', time: '2h' },
+                { tag: 'EARNINGS', title: 'NVIDIA reports record Q4 — beats estimates by 18%',                  time: '3h' },
+                { tag: 'MACRO',    title: 'Fed signals two rate cuts in 2026 amid cooling inflation',           time: '4h' },
+                { tag: 'LEVFIN',   title: 'Carlyle prices $1.2B Term Loan B at SOFR+325, 99.5 OID',             time: '6h' },
               ].map((n, i) => (
                 <div key={i} className="bg-terminal-bg/40 rounded-lg px-3 py-2.5 hover:bg-terminal-bg/60 transition-colors cursor-pointer">
                   <div className="flex items-center gap-2 mb-1">
@@ -856,10 +859,10 @@ export default function Landing({ onGetStarted }) {
           <div className="bg-gradient-to-br from-accent/10 via-purple-400/5 to-gain/10 border border-accent/20 rounded-3xl p-10 sm:p-14 backdrop-blur">
             <Zap size={36} className="text-accent mx-auto mb-4" />
             <h2 className="text-3xl sm:text-4xl font-bold leading-tight mb-3">
-              Ready to learn finance — for real?
+              Start preparing for the desk.
             </h2>
             <p className="text-base text-terminal-muted max-w-xl mx-auto mb-7">
-              Sign up in 30 seconds. Trade $100K of paper money on real markets, build an LBO model, and learn how M&amp;A deals actually work.
+              Sign up in 30 seconds. Work through the M&amp;A curriculum, build your first LBO, walk through every valuation method.
             </p>
             <button
               onClick={onGetStarted}
@@ -867,7 +870,7 @@ export default function Landing({ onGetStarted }) {
             >
               Create free account <ArrowRight size={18} />
             </button>
-            <p className="text-xs text-terminal-muted mt-5">Virtual trading only — no real money involved.</p>
+            <p className="text-xs text-terminal-muted mt-5">For students aiming at IB, leveraged finance, equity research and corporate development.</p>
           </div>
         </section>
 
