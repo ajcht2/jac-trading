@@ -11,7 +11,7 @@ import { usePrices } from '../context/PriceContext'
 import { useAuth } from '../context/AuthContext'
 import { useBot } from '../context/BotContext'
 import { formatPrice } from '../services/api'
-import Logo from './Logo'
+// (Logo intentionally not used here — signed-in interface is logo-free)
 
 const navGroups = [
   {
@@ -69,6 +69,95 @@ function LiveValue({ value, prefix = '', className = '' }) {
 }
 
 // ──────────────────────────────────────────────────────────
+// Nav group — either renders a single pill (if 1 item) or a hover/click
+// dropdown that groups its sub-items. Active when current route is inside.
+// ──────────────────────────────────────────────────────────
+function NavGroup({ group, botActive }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+  const location = useLocation()
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  // Auto-close on route change
+  useEffect(() => { setOpen(false) }, [location.pathname])
+
+  const items = group.items
+  const isInside = items.some(i => i.to === '/' ? location.pathname === '/' : location.pathname.startsWith(i.to))
+  const activeItem = items.find(i => i.to === '/' ? location.pathname === '/' : location.pathname.startsWith(i.to))
+
+  // Single-item groups render as a plain pill
+  if (items.length === 1) {
+    const { to, icon: Icon, label } = items[0]
+    return (
+      <NavLink
+        to={to}
+        end={to === '/'}
+        className={({ isActive }) =>
+          `flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
+            isActive
+              ? 'bg-white/[0.07] text-terminal-text'
+              : 'text-terminal-muted hover:text-terminal-text hover:bg-white/[0.04]'
+          }`
+        }
+        style={({ isActive }) => isActive ? { boxShadow: `inset 0 0 0 1px ${group.color}55` } : {}}
+      >
+        <Icon size={14} style={isInside ? { color: group.color } : {}} />
+        <span>{label}</span>
+      </NavLink>
+    )
+  }
+
+  // Multi-item groups render as a dropdown
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
+          isInside ? 'bg-white/[0.07] text-terminal-text' : 'text-terminal-muted hover:text-terminal-text hover:bg-white/[0.04]'
+        }`}
+        style={isInside ? { boxShadow: `inset 0 0 0 1px ${group.color}55` } : {}}
+      >
+        <span style={isInside ? { color: group.color } : {}}>{group.label}</span>
+        {isInside && activeItem && (
+          <span className="text-[10px] text-terminal-muted hidden lg:inline">/ {activeItem.label}</span>
+        )}
+        <ChevronDown size={12} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+
+      {open && (
+        <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 min-w-[200px] bg-terminal-panel/95 backdrop-blur-md border border-terminal-border rounded-2xl shadow-2xl overflow-hidden z-50 p-1.5">
+          {items.map(({ to, icon: Icon, label }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={to === '/'}
+              onClick={() => setOpen(false)}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                  isActive ? 'bg-white/[0.07]' : 'hover:bg-white/[0.04] text-terminal-muted hover:text-terminal-text'
+                }`
+              }
+              style={({ isActive }) => isActive ? { color: group.color } : {}}
+            >
+              <Icon size={14} />
+              <span className="flex-1">{label}</span>
+              {to === '/bot' && botActive && (
+                <span className="w-1.5 h-1.5 rounded-full bg-gain animate-pulse" />
+              )}
+            </NavLink>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ──────────────────────────────────────────────────────────
 // Portfolio dropdown (replaces the sidebar's PortfolioSwitcher panel).
 // ──────────────────────────────────────────────────────────
 function PortfolioMenu() {
@@ -104,11 +193,11 @@ function PortfolioMenu() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(o => !o)}
-        className="flex items-center gap-2 px-3 py-2 rounded-xl border border-terminal-border bg-terminal-panel/60 backdrop-blur hover:border-accent/30 transition-all text-sm"
+        className="flex items-center gap-1.5 pl-3 pr-2.5 py-1.5 rounded-full bg-white/[0.05] hover:bg-white/[0.08] transition-all text-sm"
       >
-        <Layers size={14} className="text-accent" />
-        <span className="font-medium max-w-[140px] truncate">{activeName}</span>
-        <ChevronDown size={14} className={`text-terminal-muted transition-transform ${open ? 'rotate-180' : ''}`} />
+        <Layers size={13} className="text-accent" />
+        <span className="font-medium max-w-[100px] truncate text-xs sm:text-sm hidden sm:inline">{activeName}</span>
+        <ChevronDown size={12} className={`text-terminal-muted transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && (
@@ -193,13 +282,12 @@ function UserMenu({ onResetActive }) {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(o => !o)}
-        className="flex items-center gap-2 px-3 py-2 rounded-xl border border-terminal-border bg-terminal-panel/60 backdrop-blur hover:border-accent/30 transition-all text-sm"
+        className="flex items-center gap-1.5 pl-1 pr-2.5 py-1 rounded-full bg-white/[0.05] hover:bg-white/[0.08] transition-all text-sm"
       >
         <div className="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center">
-          <UserIcon size={12} className="text-accent" />
+          <UserIcon size={11} className="text-accent" />
         </div>
-        <span className="font-medium max-w-[120px] truncate hidden sm:block">{user?.name || 'You'}</span>
-        <ChevronDown size={14} className={`text-terminal-muted transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown size={12} className={`text-terminal-muted transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && (
@@ -251,7 +339,7 @@ function LivePanel({ cash, positionsValue, totalEquity, totalPnl, totalPnlPct, h
   const PnlIcon = positivePnl ? TrendingUp : TrendingDown
 
   return (
-    <aside className="px-4 sm:px-6 mb-6 lg:px-0 lg:mb-0 lg:w-60 lg:fixed lg:top-[124px] lg:left-3 xl:left-6 lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto z-20 space-y-3">
+    <aside className="px-4 sm:px-6 mb-6 lg:px-0 lg:mb-0 lg:w-60 lg:fixed lg:top-[80px] lg:left-3 xl:left-6 lg:max-h-[calc(100vh-96px)] lg:overflow-y-auto z-20 space-y-3">
       {/* Live indicator strip */}
       <div className="flex items-center justify-between px-3 py-2 bg-terminal-panel/40 backdrop-blur border border-terminal-border rounded-xl">
         <div className="flex items-center gap-2">
@@ -369,60 +457,37 @@ export default function Layout({ children }) {
       }} />
 
       <div className="relative z-10 flex flex-col min-h-screen">
-        {/* Top nav — 3-column row 1 (centered logo), nav links row 2.
-            Fixed (not sticky) so overscroll bounce can't shift it. */}
-        <header className="fixed top-0 inset-x-0 z-40 backdrop-blur-md bg-terminal-bg/85 border-b border-terminal-border">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 grid grid-cols-3 items-center gap-2">
-            {/* Empty cell on the left so the logo stays optically centered */}
-            <div />
+        {/* Floating top nav — single row, no logo. Pill-style with
+            dropdown groups so the whole nav fits comfortably. */}
+        <header className="fixed top-3 inset-x-3 sm:inset-x-6 z-40">
+          <div className="max-w-7xl mx-auto bg-terminal-panel/70 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl">
+            <div className="px-3 sm:px-4 py-2 flex items-center gap-2">
+              {/* Bot indicator (left) */}
+              {botActive && (
+                <div className="hidden md:flex items-center gap-1.5 px-2 py-1 rounded-full bg-gain/10 border border-gain/30 shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-gain animate-pulse" />
+                  <span className="text-[10px] text-gain font-mono uppercase font-semibold tracking-wider">Bot</span>
+                </div>
+              )}
 
-            <NavLink to="/" className="justify-self-center">
-              <Logo size="sm" />
-            </NavLink>
+              {/* Nav groups — centered */}
+              <nav className="flex-1 flex items-center justify-center gap-1 sm:gap-2 overflow-x-auto whitespace-nowrap min-w-0">
+                {navGroups.map(group => (
+                  <NavGroup key={group.label} group={group} botActive={botActive} />
+                ))}
+              </nav>
 
-            <div className="flex items-center gap-2 justify-self-end">
-              <PortfolioMenu />
-              <UserMenu onResetActive={resetActive} />
+              {/* Right actions */}
+              <div className="flex items-center gap-1.5 shrink-0">
+                <PortfolioMenu />
+                <UserMenu onResetActive={resetActive} />
+              </div>
             </div>
           </div>
-
-          <nav className="border-t border-terminal-border bg-terminal-panel/30">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-center gap-3 sm:gap-5 overflow-x-auto whitespace-nowrap py-1.5">
-              {navGroups.map((group, gi) => (
-                <div key={group.label} className="flex items-center gap-1 sm:gap-2 shrink-0">
-                  {gi > 0 && <span className="h-5 w-px bg-terminal-border mx-1 sm:mx-2" />}
-                  <span className="hidden lg:inline text-[10px] uppercase tracking-wider font-semibold" style={{ color: group.color }}>
-                    {group.label}
-                  </span>
-                  {group.items.map(({ to, icon: Icon, label }) => (
-                    <NavLink
-                      key={to}
-                      to={to}
-                      end={to === '/'}
-                      className={({ isActive }) =>
-                        `flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all shrink-0 ${
-                          isActive
-                            ? 'bg-accent/10 text-accent border border-accent/20'
-                            : 'text-terminal-muted hover:text-terminal-text hover:bg-white/5 border border-transparent'
-                        }`
-                      }
-                    >
-                      <Icon size={14} />
-                      <span className="hidden md:inline">{label}</span>
-                      {to === '/bot' && botActive && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-gain animate-pulse" title="Bot running" />
-                      )}
-                    </NavLink>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </nav>
         </header>
 
-        {/* Body: fixed live panel on the left (lg+), main content shifted right.
-            pt clears the fixed header. */}
-        <div className="flex-1 pt-[124px] pb-6">
+        {/* Body: pt clears the floating header. */}
+        <div className="flex-1 pt-[80px] pb-6">
           <LivePanel
             cash={state.cash}
             positionsValue={positionsValue}
