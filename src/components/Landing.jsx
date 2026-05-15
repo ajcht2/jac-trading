@@ -672,19 +672,19 @@ export default function Landing({ onGetStarted }) {
           </button>
         </nav>
 
-        {/* Hero — IB / Corporate Finance positioning */}
+        {/* Hero — Investment Banking positioning, broader than M&A */}
         <section className="px-6 pt-12 pb-16 max-w-5xl mx-auto text-center space-y-7">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/30 text-[11px] font-semibold uppercase tracking-wider text-accent">
-            <Briefcase size={12} /> Investment banking · Corporate finance · For students
+            <Briefcase size={12} /> Investment banking · Built for finance students
           </div>
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05]">
-            Master valuation,<br />
+            Everything an analyst<br />
             <span className="bg-gradient-to-r from-accent via-purple-400 to-gain bg-clip-text text-transparent">
-              from comps to LBO.
+              needs to know.
             </span>
           </h1>
           <p className="text-lg sm:text-xl text-terminal-muted max-w-2xl mx-auto leading-relaxed">
-            An interactive corporate finance and M&amp;A curriculum for students targeting investment banking. Build a DCF, an LBO model and a football-field valuation — the way a junior analyst would on a live deal.
+            Eleven topics covering valuation, M&amp;A, leveraged finance, financial modeling, accounting, markets, deal process, interview prep, case studies, Excel and careers. Interactive tools where it makes sense, real sources throughout.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
             <button
@@ -701,10 +701,10 @@ export default function Landing({ onGetStarted }) {
             </a>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 max-w-3xl mx-auto">
-            <div><p className="text-2xl font-mono font-bold">8</p><p className="text-xs text-terminal-muted">Courses</p></div>
+            <div><p className="text-2xl font-mono font-bold">11</p><p className="text-xs text-terminal-muted">IB topics</p></div>
             <div><p className="text-2xl font-mono font-bold">32</p><p className="text-xs text-terminal-muted">Lessons</p></div>
             <div><p className="text-2xl font-mono font-bold">2</p><p className="text-xs text-terminal-muted">Modeling tools</p></div>
-            <div><p className="text-2xl font-mono font-bold">6</p><p className="text-xs text-terminal-muted">Valuation methods</p></div>
+            <div><p className="text-2xl font-mono font-bold">12+</p><p className="text-xs text-terminal-muted">Interview Qs</p></div>
           </div>
         </section>
 

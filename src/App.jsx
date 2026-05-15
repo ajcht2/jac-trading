@@ -16,6 +16,14 @@ import ValuationTool from './components/ValuationTool'
 import Courses from './components/Courses'
 import News from './components/News'
 import Leaderboard from './components/Leaderboard'
+import IBHub from './components/IBHub'
+import InterviewPrep from './components/InterviewPrep'
+import CaseStudies from './components/CaseStudies'
+import ExcelSkills from './components/ExcelSkills'
+import CareersPage from './components/Careers'
+import Accounting from './components/Accounting'
+import FinancialModeling from './components/FinancialModeling'
+import DealProcess from './components/DealProcess'
 
 export default function App() {
   const { user, loading } = useAuth()
@@ -61,19 +69,32 @@ export default function App() {
       <Layout>
         <ErrorBoundary>
           <Routes>
-            {/* Home now lands on M&A — positioning is IB / corporate finance */}
-            <Route path="/" element={<MergersAcquisitions />} />
+            {/* Home is the IB Hub — 11 topics overview */}
+            <Route path="/" element={<IBHub />} />
+
+            {/* The 11 IB topics */}
+            <Route path="/valuation" element={<ValuationTool />} />
             <Route path="/m-and-a" element={<MergersAcquisitions />} />
             <Route path="/lbo" element={<LboModel />} />
-            <Route path="/valuation" element={<ValuationTool />} />
+            <Route path="/financial-modeling" element={<FinancialModeling />} />
+            <Route path="/accounting" element={<Accounting />} />
+            <Route path="/deal-process" element={<DealProcess />} />
+            <Route path="/interview-prep" element={<InterviewPrep />} />
+            <Route path="/case-studies" element={<CaseStudies />} />
+            <Route path="/excel" element={<ExcelSkills />} />
+            <Route path="/careers" element={<CareersPage />} />
+
+            {/* Curriculum + news */}
             <Route path="/courses" element={<Courses />} />
             <Route path="/news" element={<News />} />
+
             {/* Engineering side-project — markets simulator */}
             <Route path="/markets" element={<Dashboard />} />
             <Route path="/trade" element={<PaperTrading />} />
             <Route path="/bot" element={<TradingBot />} />
             <Route path="/strategies" element={<Strategies />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
+
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </ErrorBoundary>

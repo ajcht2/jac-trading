@@ -4,7 +4,9 @@ import {
   BarChart3, ArrowLeftRight, Bot, BookOpen, RotateCcw, LogOut,
   Newspaper, Trophy, Plus, Pencil, Trash2, Check, X, ArrowLeft,
   ChevronDown, Layers, User as UserIcon, Wallet, TrendingUp, TrendingDown,
-  Sparkles, Briefcase, PiggyBank, Calculator, GraduationCap,
+  Sparkles, Briefcase, PiggyBank, Calculator, GraduationCap, Home,
+  FileSpreadsheet, ScrollText, FileText, MessageSquare, FolderOpen,
+  Sigma,
 } from 'lucide-react'
 import { usePortfolio } from '../context/PortfolioContext'
 import { usePrices } from '../context/PriceContext'
@@ -14,26 +16,45 @@ import { formatPrice } from '../services/api'
 // (Logo intentionally not used here — signed-in interface is logo-free)
 
 const navGroups = [
+  // Home — the IB hub overview
   {
-    label: 'M&A',
+    label: 'Home',
+    color: '#3b82f6',
+    items: [
+      { to: '/',            icon: Home,          label: 'IB Hub'           },
+    ],
+  },
+  // Core technicals — what bankers do every day
+  {
+    label: 'Technicals',
     color: '#a855f7',
     items: [
-      { to: '/m-and-a',     icon: Briefcase,     label: 'M&A Theory' },
-      { to: '/lbo',         icon: PiggyBank,     label: 'LBO Model'  },
-      { to: '/valuation',   icon: Calculator,    label: 'Valuation'  },
+      { to: '/valuation',          icon: Calculator,      label: 'Valuation'          },
+      { to: '/m-and-a',            icon: Briefcase,       label: 'M&A'                },
+      { to: '/lbo',                icon: PiggyBank,       label: 'Private Equity'     },
+      { to: '/financial-modeling', icon: FileSpreadsheet, label: 'Financial Modeling' },
+      { to: '/accounting',         icon: ScrollText,      label: 'Accounting'         },
+      { to: '/markets',            icon: BarChart3,       label: 'Markets'            },
+      { to: '/deal-process',       icon: FileText,        label: 'Deal Process'       },
     ],
   },
+  // Career-prep
   {
-    label: 'Learn',
+    label: 'Prep',
+    color: '#ef4444',
+    items: [
+      { to: '/interview-prep',     icon: MessageSquare,   label: 'Interview Prep'     },
+      { to: '/case-studies',       icon: FolderOpen,      label: 'Case Studies'       },
+      { to: '/excel',              icon: Sigma,           label: 'Excel Skills'       },
+      { to: '/careers',            icon: GraduationCap,   label: 'Careers'            },
+    ],
+  },
+  // Curriculum + news
+  {
+    label: 'Library',
     color: '#f59e0b',
     items: [
-      { to: '/courses',     icon: GraduationCap, label: 'Courses'    },
-    ],
-  },
-  {
-    label: 'News',
-    color: '#10b981',
-    items: [
+      { to: '/courses',     icon: BookOpen,      label: 'Courses'    },
       { to: '/news',        icon: Newspaper,     label: 'News'       },
     ],
   },
@@ -42,11 +63,10 @@ const navGroups = [
     label: 'Sandbox',
     color: '#64748b',
     items: [
-      { to: '/markets',     icon: BarChart3,     label: 'Markets'      },
-      { to: '/trade',       icon: ArrowLeftRight,label: 'Sim Trade'    },
-      { to: '/bot',         icon: Bot,           label: 'Bot'          },
-      { to: '/strategies',  icon: BookOpen,      label: 'Strategies'   },
-      { to: '/leaderboard', icon: Trophy,        label: 'Sim Ranking'  },
+      { to: '/trade',       icon: ArrowLeftRight, label: 'Sim Trade'   },
+      { to: '/bot',         icon: Bot,            label: 'Bot'         },
+      { to: '/strategies',  icon: BookOpen,       label: 'Strategies'  },
+      { to: '/leaderboard', icon: Trophy,         label: 'Sim Ranking' },
     ],
   },
 ]
@@ -449,8 +469,9 @@ function LivePanel({ cash, positionsValue, totalEquity, totalPnl, totalPnlPct, h
 // Main layout.
 // ──────────────────────────────────────────────────────────
 // Routes where the live portfolio panel makes sense (the sandbox simulator).
-// Hidden on every M&A / Courses / News page so they read as serious content.
-const TRADING_ROUTES = ['/markets', '/trade', '/bot', '/strategies']
+// Hidden on every IB Hub / Technicals / Prep / Library page so they read as
+// serious content.
+const TRADING_ROUTES = ['/trade', '/bot', '/strategies']
 
 export default function Layout({ children }) {
   const { state, dispatch, slots, activeSlot } = usePortfolio()
@@ -458,8 +479,7 @@ export default function Layout({ children }) {
   const { botActive, botConfig } = useBot()
   const navigate = useNavigate()
   const location = useLocation()
-  // `/` and `/m-and-a` both render the M&A page — both are "home"
-  const canGoBack = location.pathname !== '/' && location.pathname !== '/m-and-a'
+  const canGoBack = location.pathname !== '/'
   const activeSlotName = slots[activeSlot]?.name || 'Portfolio'
   const showLivePanel = TRADING_ROUTES.includes(location.pathname)
 
