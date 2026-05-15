@@ -74,7 +74,9 @@ function LiveValue({ value, prefix = '', className = '' }) {
 // ──────────────────────────────────────────────────────────
 function NavGroup({ group, botActive }) {
   const [open, setOpen] = useState(false)
+  const [dropdownPos, setDropdownPos] = useState({ left: 0, top: 0 })
   const ref = useRef(null)
+  const buttonRef = useRef(null)
   const location = useLocation()
 
   useEffect(() => {
@@ -82,6 +84,18 @@ function NavGroup({ group, botActive }) {
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
+
+  // Compute dropdown position relative to viewport when opening
+  // (avoids the parent nav's overflow-x clipping the menu)
+  useEffect(() => {
+    if (open && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect()
+      setDropdownPos({
+        left: rect.left + rect.width / 2,
+        top: rect.bottom + 8,
+      })
+    }
+  }, [open])
 
   // Auto-close on route change
   useEffect(() => { setOpen(false) }, [location.pathname])
@@ -116,6 +130,7 @@ function NavGroup({ group, botActive }) {
   return (
     <div ref={ref} className="relative">
       <button
+        ref={buttonRef}
         onClick={() => setOpen(o => !o)}
         className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
           isInside ? 'bg-white/[0.07] text-terminal-text' : 'text-terminal-muted hover:text-terminal-text hover:bg-white/[0.04]'
@@ -130,7 +145,14 @@ function NavGroup({ group, botActive }) {
       </button>
 
       {open && (
-        <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 min-w-[200px] bg-terminal-panel/95 backdrop-blur-md border border-terminal-border rounded-2xl shadow-2xl overflow-hidden z-50 p-1.5">
+        <div
+          className="fixed min-w-[200px] bg-terminal-panel/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-[60] p-1.5"
+          style={{
+            left: dropdownPos.left,
+            top: dropdownPos.top,
+            transform: 'translateX(-50%)',
+          }}
+        >
           {items.map(({ to, icon: Icon, label }) => (
             <NavLink
               key={to}
@@ -425,6 +447,10 @@ function LivePanel({ cash, positionsValue, totalEquity, totalPnl, totalPnlPct, h
 // ──────────────────────────────────────────────────────────
 // Main layout.
 // ──────────────────────────────────────────────────────────
+// Routes where the live portfolio panel makes sense (the Trading group).
+// Everywhere else (M&A, Courses, News, Leaderboard) it's hidden.
+const TRADING_ROUTES = ['/', '/trade', '/bot', '/strategies']
+
 export default function Layout({ children }) {
   const { state, dispatch, slots, activeSlot } = usePortfolio()
   const { prices, watchPriority, lastUpdate } = usePrices()
@@ -433,6 +459,7 @@ export default function Layout({ children }) {
   const location = useLocation()
   const canGoBack = location.pathname !== '/'
   const activeSlotName = slots[activeSlot]?.name || 'Portfolio'
+  const showLivePanel = TRADING_ROUTES.includes(location.pathname)
 
   const symbols = Object.keys(state.positions)
   useEffect(() => { if (symbols.length > 0) watchPriority(symbols) }, [symbols.join(','), watchPriority])
@@ -488,22 +515,27 @@ export default function Layout({ children }) {
 
         {/* Body: pt clears the floating header. */}
         <div className="flex-1 pt-[80px] pb-6">
-          <LivePanel
-            cash={state.cash}
-            positionsValue={positionsValue}
-            totalEquity={totalEquity}
-            totalPnl={totalPnl}
-            totalPnlPct={totalPnlPct}
-            hasPositions={symbols.length > 0}
-            lastUpdate={lastUpdate}
-            botActive={botActive}
-            botConfig={botConfig}
-          />
+          {showLivePanel && (
+            <LivePanel
+              cash={state.cash}
+              positionsValue={positionsValue}
+              totalEquity={totalEquity}
+              totalPnl={totalPnl}
+              totalPnlPct={totalPnlPct}
+              hasPositions={symbols.length > 0}
+              lastUpdate={lastUpdate}
+              botActive={botActive}
+              botConfig={botConfig}
+            />
+          )}
 
-          {/* On lg+, leave room on the left for the fixed panel (panel width
-              ~240px + gap). Below lg the panel renders inline above the
-              content (no left padding needed). */}
-          <main className="px-4 sm:px-6 lg:pl-[280px] xl:pl-[300px] max-w-7xl xl:max-w-[1400px] mx-auto min-w-0">
+          {/* When the live panel is showing, leave space on the left for it
+              on lg+. Otherwise, just center the content. */}
+          <main className={
+            showLivePanel
+              ? 'px-4 sm:px-6 lg:pl-[280px] xl:pl-[300px] max-w-7xl xl:max-w-[1400px] mx-auto min-w-0'
+              : 'px-4 sm:px-6 max-w-7xl mx-auto min-w-0'
+          }>
             {canGoBack && (
               <button
                 onClick={() => navigate(-1)}
