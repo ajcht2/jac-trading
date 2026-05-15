@@ -5,6 +5,7 @@ import {
   BarChart3, Briefcase, CheckCircle2,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import YouTubeEmbed from './YouTubeEmbed'
 
 // ──────────────────────────────────────────────────────────
 // Curriculum
@@ -994,6 +995,20 @@ function LessonCard({ lesson, trackColor, isOpen, onToggle }) {
               ))}
             </ul>
           </div>
+
+          {/* Optional video lecture — render only if the lesson has one */}
+          {lesson.video && (
+            <div className="pl-14">
+              <h3 className="text-xs font-bold uppercase tracking-wider mb-3 flex items-center gap-2" style={{ color: trackColor }}>
+                <Youtube size={12} /> Watch
+              </h3>
+              <YouTubeEmbed
+                video={lesson.video.id || lesson.video.url}
+                title={lesson.video.title}
+                channel={lesson.video.channel}
+              />
+            </div>
+          )}
 
           {/* Body */}
           <div className="pl-14">
