@@ -33,9 +33,9 @@ const TOPICS = [
     icon: PiggyBank,
     color: '#dc2626',
     title: 'Private Equity',
-    desc: 'LBO mechanics, sources & uses, IRR / MOIC, the value-creation bridge, and how PE firms earn their fees.',
-    learn:    { to: '/m-and-a', label: 'Learn the theory' },
-    interact: { to: '/lbo',     label: 'Build an LBO'     },
+    desc: 'Fund structure, GP / LP economics, PE strategies, LBO mechanics, value-creation drivers and exit paths.',
+    learn:    { to: '/private-equity', label: 'Learn the theory' },
+    interact: { to: '/lbo',            label: 'Build an LBO'     },
   },
   {
     id: 'modeling',

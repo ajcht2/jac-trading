@@ -101,8 +101,8 @@ export default function LboModel() {
             Interactive leveraged buyout — see how sponsor returns are built from leverage, EBITDA growth, and multiple expansion.
           </p>
         </div>
-        <Link to="/m-and-a" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent/10 text-accent text-sm font-medium hover:bg-accent/20 transition-colors">
-          M&A theory <ArrowRight size={14} />
+        <Link to="/private-equity" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent/10 text-accent text-sm font-medium hover:bg-accent/20 transition-colors">
+          PE theory <ArrowRight size={14} />
         </Link>
       </div>
 

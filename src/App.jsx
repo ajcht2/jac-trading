@@ -24,6 +24,7 @@ import CareersPage from './components/Careers'
 import Accounting from './components/Accounting'
 import FinancialModeling from './components/FinancialModeling'
 import DealProcess from './components/DealProcess'
+import PrivateEquity from './components/PrivateEquity'
 
 export default function App() {
   const { user, loading } = useAuth()
@@ -76,6 +77,7 @@ export default function App() {
             <Route path="/valuation" element={<ValuationTool />} />
             <Route path="/m-and-a" element={<MergersAcquisitions />} />
             <Route path="/lbo" element={<LboModel />} />
+            <Route path="/private-equity" element={<PrivateEquity />} />
             <Route path="/financial-modeling" element={<FinancialModeling />} />
             <Route path="/accounting" element={<Accounting />} />
             <Route path="/deal-process" element={<DealProcess />} />
