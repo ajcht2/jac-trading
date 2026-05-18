@@ -43,6 +43,11 @@ export default defineConfig({
         // Cache strategies. Use NetworkFirst for the API so prices stay fresh,
         // CacheFirst for fonts and images so they don't re-fetch each visit.
         globPatterns: ['**/*.{js,css,html,ico,png,jpg,jpeg,svg,woff,woff2}'],
+        // Force the new SW to take control immediately on update — kills the
+        // "old bundle still served from cache" problem on iOS Safari.
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
