@@ -5,6 +5,7 @@ import Layout from './components/Layout'
 import Login from './components/Login'
 import Landing from './components/Landing'
 import ErrorBoundary from './components/ErrorBoundary'
+import InstallPrompt from './components/InstallPrompt'
 import Onboarding from './components/Onboarding'
 import Dashboard from './components/Dashboard'
 import PaperTrading from './components/PaperTrading'
@@ -60,6 +61,7 @@ export default function App() {
         {showLogin
           ? <Login onBack={() => setShowLogin(false)} />
           : <Landing onGetStarted={() => setShowLogin(true)} />}
+        <InstallPrompt />
       </ErrorBoundary>
     )
   }
@@ -67,6 +69,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       {showOnboarding && <Onboarding onComplete={completeOnboarding} />}
+      <InstallPrompt />
       <Layout>
         <ErrorBoundary>
           <Routes>
