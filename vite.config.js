@@ -2,15 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// Injected at build time so we can prove on a running page WHICH build
-// the user is loading. If mobile and desktop see different values,
-// they are loading different deployments.
-const BUILD_ID = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 14)
-
 export default defineConfig({
-  define: {
-    __BUILD_ID__: JSON.stringify(BUILD_ID),
-  },
   plugins: [
     react(),
     VitePWA({
