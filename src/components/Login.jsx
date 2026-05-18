@@ -10,14 +10,37 @@ function EnvDebug() {
   const url = import.meta.env.VITE_SUPABASE_URL || ''
   const keyLen = (import.meta.env.VITE_SUPABASE_ANON_KEY || '').length
   const urlPreview = url ? `${url.slice(0, 24)}…` : 'EMPTY'
+  const buildId = typeof __BUILD_ID__ !== 'undefined' ? __BUILD_ID__ : 'N/A'
+
+  const nuke = async () => {
+    try {
+      // 1. Unregister every service worker for this origin
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations()
+        await Promise.all(regs.map(r => r.unregister()))
+      }
+      // 2. Delete every cache from CacheStorage
+      if ('caches' in window) {
+        const keys = await caches.keys()
+        await Promise.all(keys.map(k => caches.delete(k)))
+      }
+    } catch {}
+    // 3. Hard-reload bypassing HTTP cache
+    window.location.replace(window.location.origin + '/?nuke=' + Date.now())
+  }
+
   return (
-    <div className="fixed top-2 left-2 right-2 z-50 bg-black/80 backdrop-blur border border-white/20 rounded-lg p-2 text-[10px] font-mono space-y-0.5">
+    <div className="fixed top-2 left-2 right-2 z-50 bg-black/85 backdrop-blur border border-white/20 rounded-lg p-2 text-[10px] font-mono space-y-0.5">
       <p className={isSupabaseConfigured ? 'text-gain' : 'text-loss'}>
         isSupabaseConfigured: {String(isSupabaseConfigured)}
       </p>
       <p className="text-terminal-muted">URL: <span className="text-terminal-text">{urlPreview}</span></p>
       <p className="text-terminal-muted">KEY length: <span className="text-terminal-text">{keyLen}</span></p>
+      <p className="text-terminal-muted">Build: <span className="text-accent">{buildId}</span></p>
       <p className="text-terminal-muted">UA: <span className="text-terminal-text">{navigator.userAgent.slice(0, 50)}…</span></p>
+      <button onClick={nuke} className="mt-1 px-2 py-1 bg-loss/20 text-loss rounded text-[10px] font-bold w-full">
+        Nuke caches + SW + reload
+      </button>
     </div>
   )
 }
