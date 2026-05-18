@@ -2,6 +2,25 @@ import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { ArrowRight, ArrowLeft, BarChart3, Bot, Wallet, Lock, Mail, User } from 'lucide-react'
 import Logo from './Logo'
+import { isSupabaseConfigured } from '../services/supabase'
+
+// Temporary diagnostic — shows whether env vars are in the bundle.
+// Visible on the login page only.
+function EnvDebug() {
+  const url = import.meta.env.VITE_SUPABASE_URL || ''
+  const keyLen = (import.meta.env.VITE_SUPABASE_ANON_KEY || '').length
+  const urlPreview = url ? `${url.slice(0, 24)}…` : 'EMPTY'
+  return (
+    <div className="fixed top-2 left-2 right-2 z-50 bg-black/80 backdrop-blur border border-white/20 rounded-lg p-2 text-[10px] font-mono space-y-0.5">
+      <p className={isSupabaseConfigured ? 'text-gain' : 'text-loss'}>
+        isSupabaseConfigured: {String(isSupabaseConfigured)}
+      </p>
+      <p className="text-terminal-muted">URL: <span className="text-terminal-text">{urlPreview}</span></p>
+      <p className="text-terminal-muted">KEY length: <span className="text-terminal-text">{keyLen}</span></p>
+      <p className="text-terminal-muted">UA: <span className="text-terminal-text">{navigator.userAgent.slice(0, 50)}…</span></p>
+    </div>
+  )
+}
 
 export default function Login({ onBack }) {
   const { signUp, signIn, resetPassword, error, setError } = useAuth()
@@ -48,6 +67,7 @@ export default function Login({ onBack }) {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 relative">
+      <EnvDebug />
       <div className="fixed inset-0 z-0" style={{
         backgroundImage: 'url(/city-bg.jpg)',
         backgroundSize: 'cover',
