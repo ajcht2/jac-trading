@@ -14,7 +14,25 @@ body {
   color: #e2e8f0;
   min-height: 100vh;
   overflow-x: hidden;
+  /* Native-app feel: respect iPhone safe areas (notch + home indicator) */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  /* Disable Safari's tap-highlight blue flash on tap */
+  -webkit-tap-highlight-color: transparent;
+  /* Disable iOS Safari double-tap zoom — feels web-like */
+  touch-action: manipulation;
+  /* Prevent text selection on tap for app-like feel (still allow in inputs) */
+  -webkit-user-select: none;
+  user-select: none;
 }
+
+input, textarea, [contenteditable] {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Disable pull-to-refresh on iOS Safari */
+html, body { overscroll-behavior-y: none; }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }

@@ -12,9 +12,21 @@
 
     <!-- iOS Safari "Add to Home Screen" support -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="JAC" />
     <link rel="apple-touch-icon" href="/logo.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/logo.png" />
+    <!-- Splash screen color matches the app dark background → no white flash on launch -->
+    <meta name="apple-mobile-web-app-orientations" content="portrait" />
+
+    <!-- Prevent zoom on input focus (iOS Safari behaviour) -->
+    <style>
+      input, select, textarea { font-size: 16px !important; }
+      @media screen and (min-width: 1024px) {
+        input, select, textarea { font-size: inherit !important; }
+      }
+    </style>
 
     <!-- Open Graph (shareable link preview) -->
     <meta property="og:title" content="JAC — Investment Banking for Students" />

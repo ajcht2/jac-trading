@@ -14,6 +14,7 @@ import { useAuth } from '../context/AuthContext'
 import { useBot } from '../context/BotContext'
 import { formatPrice } from '../services/api'
 // (Logo intentionally not used here — signed-in interface is logo-free)
+import { MobileHeader, BottomTabBar, MobileDrawer, AccountSheet } from './MobileShell'
 
 const navGroups = [
   // Home — the IB hub overview
@@ -496,6 +497,9 @@ export default function Layout({ children }) {
     if (confirm(`Reset "${activeSlotName}" to $100,000?`)) dispatch({ type: 'FULL_RESET' })
   }
 
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [accountOpen, setAccountOpen] = useState(false)
+
   return (
     <div className="min-h-screen relative">
       <div className="fixed inset-0 z-0" style={{
@@ -506,9 +510,14 @@ export default function Layout({ children }) {
       }} />
 
       <div className="relative z-10 flex flex-col min-h-screen">
-        {/* Floating top nav — single row, no logo. Pill-style with
-            dropdown groups so the whole nav fits comfortably. */}
-        <header className="fixed top-3 inset-x-3 sm:inset-x-6 z-40">
+        {/* ───── Mobile shell: native-app look ───── */}
+        <MobileHeader onMenuOpen={() => setDrawerOpen(true)} />
+        <MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+        <BottomTabBar onAccountOpen={() => setAccountOpen(true)} />
+        <AccountSheet open={accountOpen} onClose={() => setAccountOpen(false)} onResetActive={resetActive} />
+
+        {/* ───── Desktop floating header ───── */}
+        <header className="hidden lg:block fixed top-3 inset-x-3 sm:inset-x-6 z-40">
           <div className="max-w-7xl mx-auto bg-terminal-panel/70 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl">
             <div className="px-3 sm:px-4 py-2 flex items-center gap-2">
               {/* Bot indicator (left) */}
@@ -535,8 +544,9 @@ export default function Layout({ children }) {
           </div>
         </header>
 
-        {/* Body: pt clears the floating header. */}
-        <div className="flex-1 pt-[80px] pb-6">
+        {/* Body: pt clears the top header (48px mobile, 80px desktop),
+            pb clears the bottom tab bar on mobile (~72px including safe area). */}
+        <div className="flex-1 pt-[60px] lg:pt-[80px] pb-24 lg:pb-6">
           {showLivePanel && (
             <LivePanel
               cash={state.cash}
@@ -561,7 +571,7 @@ export default function Layout({ children }) {
             {canGoBack && (
               <button
                 onClick={() => navigate(-1)}
-                className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-terminal-border bg-terminal-panel/60 backdrop-blur text-terminal-muted hover:text-accent hover:border-accent/30 transition-all text-xs font-medium"
+                className="hidden lg:inline-flex mb-4 items-center gap-2 px-3 py-1.5 rounded-xl border border-terminal-border bg-terminal-panel/60 backdrop-blur text-terminal-muted hover:text-accent hover:border-accent/30 transition-all text-xs font-medium"
                 title="Go back"
               >
                 <ArrowLeft size={14} /> Back
